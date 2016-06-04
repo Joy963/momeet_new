@@ -9,19 +9,6 @@ from momeet.lib import auth
 bp = Blueprint('account', __name__)
 
 
-@auth.verify_token
-def verify_token(token):
-    user = User.verify_auth_token(token)
-    # if not user:
-    #     return False
-    #     # try to authenticate with username/password
-    #     # user = User.query.filter_by(username=username_or_token).first()
-    #     # if not user or not user.verify_password(password):
-    #     #     return False
-    g.user = user
-    return True
-
-
 class OldUserExistCheck(BaseView):
     def post(self):
         data = json.loads(request.data)
@@ -32,6 +19,7 @@ class NewUserInfoCreate(BaseView):
     def post(self):
         data = json.loads(request.data)
         user = User.create_or_update(**data)
+        g.user = user
         return json.dumps({"success": True, "uid": user.id})
 
 

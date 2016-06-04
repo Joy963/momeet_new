@@ -92,7 +92,7 @@ class User(BaseModel):
 
     def generate_auth_token(self, expiration=600):
         s = Serializer(c.SECRET_KEY, expires_in=expiration)
-        return s.dumps({'id': self.id})
+        return s.dumps({'social_id': self.social_id})
 
     @staticmethod
     def verify_auth_token(token):
@@ -103,7 +103,7 @@ class User(BaseModel):
             return None
         except BadSignature:
             return None
-        return get_user(data['id'])
+        return get_user_by_social_id(data['social_id'])
 
     @classmethod
     def create_or_update(cls, **kwargs):
@@ -111,7 +111,6 @@ class User(BaseModel):
         user.social_id = kwargs.get("openid")
         user.user_name = kwargs.get("nickname")
         head_img_url = kwargs.get("head_img_url")
-        print (head_img_url)
         file_data = cStringIO.StringIO(urllib2.urlopen(head_img_url).read())
         file_name = user.social_id + ".jpg"
 
