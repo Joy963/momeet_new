@@ -79,7 +79,10 @@ class User(BaseModel):
     religion = db.Column(db.SmallInteger, default=0)  # 信仰
     is_active = db.Column(db.Boolean, default=True)
     created = db.Column(db.DateTime, default=datetime.now)
-    dict_default_columns = ['id', 'user_name', 'gender', 'avatar', 'age']
+    dict_default_columns = ['avatar', 'real_name', 'gender',
+                            'birthday', 'height', 'location', 'affection',
+                            'mobile_num', 'weixin_num', 'industry_id',
+                            'income', 'hometown', 'constellation']
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -121,7 +124,8 @@ class User(BaseModel):
         user.location = "{},{}".format(kwargs.get("province"),
                                        kwargs.get("province"))
         user.country = kwargs.get("country")
-        user.save()
+        db.session.add(user)
+        db.session.commit()
         return user
 
 
@@ -220,8 +224,7 @@ class UserInfoProcess(object):
 
     def save_auth_info(self, auth_info):
         info = get_user_info(self.user_id)
-        _auth_info = [int(_) for _ in auth_info if safe_int(_)]
-        info.auth_info = _auth_info
+        info.auth_info = ''.join(auth_info)
         info.save()
 
 

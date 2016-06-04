@@ -218,7 +218,7 @@ class UserAuthView(BaseView):
         )
 
     def post(self, user_id):
-        user,info = self.check(user_id)
+        user, info = self.check(user_id)
         form = UserAuthForm(obj=info)
         if form.validate_on_submit():
             form.save()
