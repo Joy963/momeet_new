@@ -1,0 +1,96 @@
+{% extends "dashboard/_base.html" %}
+{% block content %}
+{% from "page.html" import render_pagination %}
+{% from "dashboard/macro.html" import show_flash_messages %} 
+
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-lg-12">
+      <h1 class="page-header">用户列表</h1>
+    </div>
+  </div>
+
+  {{show_flash_messages()}}
+
+  <div class="row">
+    <div class="col-lg-12">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">用户列表</h3>
+        </div>
+        <div class="panel-body">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th class="per5">ID</th>
+                <th class="per10">用户名</th>
+                <th class="per10">性别</th>
+                <th class="per20">操作</th>
+                <th class="per15">邀约</th>
+                <th class="per15">认证</th>
+                <th class="per10">查看</th>
+                <th class="per5">删除</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for item in items %}
+              <tr url="{{url_for('dashboard.user.item',res_id=item.id)}}">
+                <td>{{item.id}}</td>
+                <td>{{item.user_name}}</td>
+                <td>{{gender_desc.get(safe_int(item.gender))}}</td>
+                <td>
+                  <a href="{{url_for('dashboard.user.item',res_id=item.id)}}" class="btn btn-xs btn-success">修改基本信息</a>
+                  <a href="{{url_for('dashboard.user.photos',user_id=item.id)}}" class="btn btn-xs btn-success">修改照片</a>
+                  <a href="{{url_for('dashboard.user.detail',user_id=item.id)}}" class="btn btn-xs btn-success">修改详情</a>
+                </td>
+                <td>
+                  <a href="{{url_for('dashboard.user.invitation',user_id=item.id)}}" class="btn btn-xs btn-success">管理邀约</a>
+                </td>
+                <td>
+                  <a href="{{url_for('dashboard.user.auth',user_id=item.id)}}" class="btn btn-xs btn-success">管理认证</a>
+                </td>
+                <td>
+                  <button type="button" class="btn btn-xs btn-info"> 查看</button>
+                </td>
+                <td>
+                  <button type="button" class="btn btn-xs btn-danger btn-del">删除</button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {{render_pagination(pagination)}}
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function() {
+    $('.btn-del').click(function() {
+      var url = $(this).parent().parent().attr("url");
+      var data = {
+        'flag': 'del'
+      }
+      if (confirm("确定删除么!")) {
+        $.ajax({
+          type: "POST",
+          url: url,
+          data: data,
+          success: function(data) {
+            location.reload();
+          },
+          dataType: 'json'
+        });
+      }
+    })
+  });
+</script>
+{% endblock %}

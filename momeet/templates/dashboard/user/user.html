@@ -1,0 +1,190 @@
+{% extends "dashboard/_base.html" %}
+{% block style %}
+<link rel="stylesheet" type="text/css" media="all" href="{{ static_file('dashboard/js/daterangepicker/daterangepicker-bs3.css') }}" />
+{% endblock %}
+
+{% block content %}
+{% from "dashboard/macro.html" import form_field %}
+{% from "dashboard/macro.html" import form_filefield %}
+{% from "dashboard/macro.html" import form_radio %}
+{% from "dashboard/macro.html" import form_date %}
+{% from "dashboard/macro.html" import form_select %}
+{% from "dashboard/macro.html" import form_submit %}
+{% from "dashboard/macro.html" import show_flash_messages %} 
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-lg-12">
+      {% if not user %}
+      <h1 class="page-header">添加用户</h1>
+      {%else%}
+      <h1 class="page-header">
+        修改
+        <span class="text-danger">[{{user.user_name}}]</span>
+        的基本信息
+      </h1>
+      {%endif%}
+    </div>
+  </div>
+
+  {{show_flash_messages()}}
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+        </div>
+        <div class="panel-body">
+          <form class="form-horizontal group-border hover-stripped" role="form" method="post" id="user_form"
+          action='' enctype="multipart/form-data">
+            {{ form.csrf_token }} 
+            {{ form_field(form.user_name) }} 
+            {{ form_filefield(form.avatar) }} 
+            {% if user and user.avatar %}
+            <div class="form-group">
+                <label class="col-lg-1 col-md-2 col-sm-12 control-label" for="">当前图标</label>
+                <div class="col-lg-10 col-md-10">
+                    <img src="{{ user.avatar }}" alt="" width='100' height='100'/>
+                </div>
+            </div>
+            {%endif%}
+            
+            {{ form_radio(form.gender) }} 
+            {{ form_field(form.real_name) }} 
+            {{ form_field(form.id_card) }} 
+            {{ form_date(form.birthday) }} 
+            {{ form_field(form.height) }} 
+            {{ form_field(form.mobile_num) }} 
+            {{ form_field(form.weixin_num) }} 
+            {{ form_field(form.location,hide_field=True) }} 
+            <div class="form-group" >
+                <label class="col-lg-1 col-md-2 col-sm-12 control-label" for="">所在城市</label>
+                <div class="col-lg-2 col-md-5">
+                    <select class="form-control" id="province">
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-5">
+                    <select class="form-control" id="city">
+                    </select>
+                </div>
+            </div>
+            {{ form_select(form.industry) }} 
+            {{ form_field(form.company_name) }} 
+            {{ form_field(form.profession) }} 
+            {{ form_select(form.affection) }} 
+            {{ form_select(form.income) }} 
+            {{ form_field(form.graduated) }} 
+            {{ form_select(form.education) }} 
+            {{ form_field(form.hometown,hide_field=True) }} 
+            <div class="form-group" >
+                <label class="col-lg-1 col-md-2 col-sm-12 control-label" for="">家乡</label>
+                <div class="col-lg-2 col-md-5">
+                    <select class="form-control" id="province1">
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-5">
+                    <select class="form-control" id="city1">
+                    </select>
+                </div>
+            </div>
+            {{ form_select(form.drink) }} 
+            {{ form_select(form.smoke) }} 
+            {{ form_select(form.constellation) }} 
+            {{ form_select(form.religion) }} 
+
+            <div class="form-group">
+                <label class="col-lg-1 col-md-2 col-sm-12 control-label"></label>
+                <div class="col-lg-10 col-md-10">
+                    <button type="botton" id="commit" class="btn btn-lg btn-primary">提交</button>
+                </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+{% block js %}
+  <script type="application/javascript" src="{{ static_file('dashboard/js/jquery.city.select.min.js') }}"></script>
+  <script type="text/javascript" src="{{ static_file('dashboard/js/daterangepicker/moment.js') }}"></script>
+  <script type="text/javascript" src="{{ static_file('dashboard/js/daterangepicker/daterangepicker.js') }}"></script>
+  
+  <script type="text/javascript" charset="utf-8">
+  $(document).ready(function() {
+
+        var selected1 = "0,0";
+        var selected2 = "0,0";
+        {% if user %}
+            {% if user.location %}
+                selected1 = "{{user.location}}";
+            {% endif %}
+            {% if user.hometown%}
+                selected2 = "{{user.hometown}}";
+            {% endif %}
+        {% endif %}
+
+        $("#birthday").daterangepicker({
+            singleDatePicker: true,
+            showDropdowns: true,
+            format: "YYYY-MM-DD",
+            autoclose: true,
+            timePickerIncrement: 1,
+        });
+
+        function constellation(m, d) {
+            return m-(d<"102223444433".charAt(m-1)- -19)+1;
+        }
+
+        $("#birthday").change(function(){
+            var _val = $(this).val();
+            if (_val){
+                var birthday = new Date(_val);
+                var mon = birthday.getMonth()+1;
+                var day = birthday.getDate();
+                console.log(mon);
+                console.log(day);
+                var i = constellation(mon,day);
+                console.log(i);
+                $("#constellation").val(i).change();
+                
+            }
+        });
+
+        var city_data_url = '{{url_for('dashboard.cities')}}';
+        $.getJSON( city_data_url, function( data ) {
+            var  d = data.data;
+            $('#province, #city').citylist({
+                    data    : d,
+                    id      : 'id',
+                    children: 'cities',
+                    name    : 'name',
+                    metaTag : 'name',
+                    selected: selected1.split(',')
+            });
+
+            $('#province1, #city1').citylist({
+                    data    : d,
+                    id      : 'id',
+                    children: 'cities',
+                    name    : 'name',
+                    metaTag : 'name',
+                    selected: selected2.split(',')
+            });
+        });
+        $("#commit").click(function(){
+            $(this).attr('disabled',true); 
+            var p = $( "#province option:selected").attr("name");
+            var c = $( "#city option:selected" ).attr("name");
+            $('#location').val(p+ ','+ c);
+            var p1 = $( "#province1 option:selected").attr("name");
+            var c1 = $( "#city1 option:selected" ).attr("name");
+            $('#hometown').val(p1+ ','+ c1);
+            console.log($('#location').val());
+            console.log($('#hometown').val());
+            $("#user_form").submit();
+        });
+  });
+  </script>
+{% endblock %}
+

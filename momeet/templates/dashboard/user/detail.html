@@ -1,0 +1,71 @@
+{% extends "dashboard/_base.html" %}
+
+{% block style %}
+<link rel="stylesheet" type="text/css" media="all" href="{{ static_file('dashboard/js/summernote/summernote.css') }}" />
+{% endblock %}
+{% block content %}
+{% from "dashboard/macro.html" import form_textarea %}
+{% from "dashboard/macro.html" import form_submit %}
+{% from "dashboard/macro.html" import show_flash_messages %} 
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">
+            管理用户
+            <span class="text-danger">[{{user.user_name}}]</span>
+            的详情
+        </h1>
+    </div>
+  </div>
+
+  {{show_flash_messages()}}
+
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+        </div>
+        <div class="panel-body">
+          <form class="form-horizontal group-border hover-stripped" role="form" method="post" id="user_form"
+              action='' >
+            {{ form.csrf_token }} 
+            {{ form_textarea(form.description) }} 
+            {{ form_textarea(form.detail) }} 
+            {{ form_submit() }} 
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+{% block js %}
+  <script type="application/javascript" src="{{ static_file('dashboard/js/summernote/summernote.js') }}"></script>
+  <script type="application/javascript" src="{{ static_file('dashboard/js/summernote/upload.js') }}"></script>
+  <script type="application/javascript" src="{{ static_file('dashboard/js/summernote/plugin.js') }}"></script>
+  
+<script type="text/javascript" charset="utf-8">
+        $(document).ready(function() {
+            $('#detail').summernote({
+                toolbar: [
+                    ['insert', ['picture']],
+                    ['insert', ['titledesc','clear_titledesc']],
+                    ['view', ['codeview','fullscreen']],
+                ],
+                height:600,
+                width:1000,
+                lang: 'zh-CN',
+                onImageUpload: function(files, editor, welEditable) {
+                    $.each(files, function (idx, file) {
+                        sendFile(file,editor,welEditable);
+                    });
+                }
+            });
+
+        });
+    
+</script>
+{% endblock %}
+

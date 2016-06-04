@@ -1,0 +1,65 @@
+{% macro render_pagination(pagination, anchor_name='') %}
+    <div class="container-fluid"
+         style="position: relative;height: 40px;width: 100%;text-align: center;">
+        <div style="position: absolute;left: 0;top: 0;width: auto;">
+            共有 {{ pagination.total_count }} 条记录
+        </div>
+
+        <ul class="pagination" style="margin: auto;width: auto;">
+            {% if pagination.has_prev %}
+                <li>
+                    <a href="
+                            {{ url_for_page(pagination.page - 1, endpoint=pagination.endpoint, params=pagination.params) }}{{ anchor_name }}"
+                       aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="disabled">
+                    <a href="javascript:;" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+
+            {%- for page in pagination.iter_pages() %}
+
+                {% if page %}
+
+                    {% if page != pagination.page %}
+                        <li>
+                            <a href="
+                                    {{ url_for_page(page, endpoint=pagination.endpoint, params=pagination.params) }}{{ anchor_name }}">{{ page }}</a>
+                        </li>
+                    {% else %}
+                        <li class="active">
+                            <a href="javascript:;">{{ pagination.page }}</a>
+                        </li>
+                    {% endif %}
+
+                {% else %}
+                    <li class="disabled">
+                        <a href="javascript:;">...</a>
+                    </li>
+                {% endif %}
+
+            {%- endfor %}
+
+            {% if pagination.has_next %}
+                <li>
+                    <a href="
+                            {{ url_for_page(pagination.page + 1, endpoint=pagination.endpoint, params=pagination.params) }}{{ anchor_name }}"
+                       aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="disabled">
+                    <a href="javascript:;" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+{% endmacro %}
