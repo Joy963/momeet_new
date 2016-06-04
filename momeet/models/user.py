@@ -182,7 +182,7 @@ class UserInvitation(BaseModel):
 
 
 def get_user(user_id):
-    if user_id.isdigit():
+    if str(user_id).isdigit():
         return User.query.get(user_id)
     return User.query.filter_by(social_id=user_id).first()
 
