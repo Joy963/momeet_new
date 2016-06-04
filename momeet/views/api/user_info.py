@@ -3,7 +3,7 @@ from ._base import BaseView
 from momeet.lib import auth
 from momeet.models.user import (
     get_user_by_social_id,
-    User
+    get_user
 )
 
 bp = Blueprint('user_info', __name__)
@@ -11,7 +11,10 @@ bp = Blueprint('user_info', __name__)
 
 class GetUserBaseInfo(BaseView):
     def get(self, openid):
-        user = get_user_by_social_id(openid)
+        if openid.isdigit():
+            user = get_user(openid)
+        else:
+            user = get_user_by_social_id(openid)
         return json.dumps(user.to_dict() if user else {})
 
 
