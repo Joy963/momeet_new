@@ -31,6 +31,7 @@ from momeet.constants.city import CITY_DATA
 from momeet.models.industry import get_all_industry, get_industry
 from momeet.models.user import (
     get_user_by_name, User,
+    UserProcess,
     UserInfoProcess,
     UserInvitationProcess
 )
@@ -287,6 +288,23 @@ class UserPhotoForm(BaseForm):
         _photo = save_upload_file_to_qiniu(_file)
         photos = process.add_photo(_photo)
         return photos
+
+
+class UserAvatarForm(BaseForm):
+    avatar = FileField(UserFields.AVATAR)
+
+    def validate_avatar(self, field):
+        if not field.data:
+            return
+        filename = field.data.filename
+        if not allowed_file(filename):
+            raise ValueError(ErrorsEnum.IMAGE_ERROR.describe())
+
+    def save(self, openid):
+        process = UserProcess(openid)
+        _file = self.avatar.data
+        _avatar = save_upload_file_to_qiniu(_file)
+        return process.update_avatar(_avatar)
 
 
 class UserDetailForm(BaseForm):

@@ -209,7 +209,7 @@ class UserAuthView(BaseView):
         return user, info
 
     def get(self, user_id):
-        user,info = self.check(user_id)
+        user, info = self.check(user_id)
         form = UserAuthForm(obj=info)
         return render_template(
             self.template_name,

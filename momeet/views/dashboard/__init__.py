@@ -27,7 +27,6 @@ def before_request(app):
 
 
 def resources(app):
-    # TODO csrf
     # csrf = CsrfProtect()
     # csrf.init_app(app)
     if not hasattr(app, '_static_hash'):

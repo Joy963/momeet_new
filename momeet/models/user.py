@@ -184,6 +184,20 @@ def get_user_info(user_id):
     return info
 
 
+class UserProcess(object):
+    def __init__(self, openid):
+        self.openid = openid
+
+    def update_avatar(self, avatar_uri):
+        user = get_user_by_social_id(self.openid)
+        if not user:
+            return False
+        user.avatar = avatar_uri
+        db.session.add(user)
+        db.session.commit()
+        return avatar_uri
+
+
 class UserInfoProcess(object):
 
     def __init__(self, user_id):
