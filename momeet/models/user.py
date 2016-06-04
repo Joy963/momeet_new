@@ -48,12 +48,11 @@ class Privilege(BaseModel):
 class User(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     social_id = db.Column(db.String(100))  # openid
-    wechat_union_id = db.Column(db.String(100))
+    wechat_union_id = db.Column(db.String(100))  # 微信唯一ID
     avatar = db.Column(db.String(500))  # 头像
     gender = db.Column(db.SmallInteger, default=0)  # 性别
     user_name = db.Column(db.String(40), index=True, nullable=False)  # 用户名
 
-    # invitation_code = db.Column(db.String(7), unique=True, index=True)  # 邀请码
     real_name = db.Column(db.String(40))  # 真实姓名
     id_card = db.Column(db.String(40))  # 身份证信息
     birthday = db.Column(db.DateTime)  # 出生日期
@@ -62,21 +61,24 @@ class User(BaseModel):
     mobile_num = db.Column(db.String(20), index=True)  # 手机号
     weixin_num = db.Column(db.String(100))  # 微信号
 
-    country = db.Column(db.String(20))
+    country = db.Column(db.String(20))  # 国家
     location = db.Column(db.String(100), default='0,0')  # 所在城市
 
     industry_id = db.Column(db.Integer, default=0)  # 行业
     company_name = db.Column(db.String(100))  # 公司名称
     profession = db.Column(db.String(100))  # 职位
-    affection = db.Column(db.SmallInteger, default=0)  # 感情状况
     income = db.Column(db.SmallInteger, default=0)  # 年收入
+
+    affection = db.Column(db.SmallInteger, default=0)  # 感情状况
     graduated = db.Column(db.String(100))  # 毕业院校
     education = db.Column(db.SmallInteger, default=0)  # 学历
     hometown = db.Column(db.String(100), default='0,0')  # 家乡
+
     drink = db.Column(db.SmallInteger, default=0)  # 是否喝酒
     smoke = db.Column(db.SmallInteger, default=0)  # 是否抽烟
     constellation = db.Column(db.SmallInteger, default=0)  # 星座
     religion = db.Column(db.SmallInteger, default=0)  # 信仰
+
     is_active = db.Column(db.Boolean, default=True)
     created = db.Column(db.DateTime, default=datetime.now)
     dict_default_columns = ['avatar', 'real_name', 'gender',
@@ -129,6 +131,27 @@ class User(BaseModel):
         return user
 
 
+class WorkExperience(BaseModel):
+    dict_default_columns = []
+
+    id = db.Column(db.Integer, nullable=False, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    industry_id = db.Column(db.Integer, default=0)  # 行业
+    company_name = db.Column(db.String(100))  # 公司名称
+    profession = db.Column(db.String(100))  # 职位
+    income = db.Column(db.SmallInteger, default=0)  # 年收入
+
+
+class EduExperience(BaseModel):
+    dict_default_columns = ["id", "graduated", "education", "specialty"]
+
+    id = db.Column(db.Integer, nullable=False, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    graduated = db.Column(db.String(100))  # 毕业院校
+    education = db.Column(db.SmallInteger, default=0)  # 学历
+    specialty = db.Column(db.String(100))   # 专业
+
+
 class UserInfo(BaseModel):
     user_id = db.Column(db.Integer, nullable=False, primary_key=True)
     photos = db.Column(db.String(3000))  # 照片
@@ -159,7 +182,9 @@ class UserInvitation(BaseModel):
 
 
 def get_user(user_id):
-    return User.query.get(user_id)
+    if user_id.isdigit():
+        return User.query.get(user_id)
+    return User.query.filter_by(social_id=user_id).first()
 
 
 def get_user_by_name(user_name):
@@ -187,15 +212,31 @@ def get_user_info(user_id):
 class UserProcess(object):
     def __init__(self, openid):
         self.openid = openid
+        self.user = get_user(self.openid)
 
     def update_avatar(self, avatar_uri):
-        user = get_user_by_social_id(self.openid)
-        if not user:
+        if not self.user:
             return False
-        user.avatar = avatar_uri
-        db.session.add(user)
+        self.user.avatar = avatar_uri
+        db.session.add(self.user)
         db.session.commit()
         return avatar_uri
+
+    def add_edu_experience(self, d):
+        if not self.user:
+            return False
+        edu = EduExperience(user_id=self.user.id)
+        for k, v in d.items():
+            setattr(edu, k, v)
+        return edu.save()
+
+    def add_work_experience(self, d):
+        if not self.user:
+            return False
+        work = WorkExperience(user_id=self.user.id)
+        for k, v in d.items():
+            setattr(work, k, v)
+        return work.save()
 
 
 class UserInfoProcess(object):
@@ -248,7 +289,8 @@ class UserInvitationProcess(object):
         self.user_id = user_id
 
     def get_all_invitation(self):
-        _all = UserInvitation.query.filter_by(user_id=self.user_id, is_active=True).order_by(UserInvitation.id.desc()).all()
+        _all = UserInvitation.query.filter_by(
+            user_id=self.user_id, is_active=True).order_by(UserInvitation.id.desc()).all()
         return _all
 
     def get_all_invitation_dict(self):

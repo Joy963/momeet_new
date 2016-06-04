@@ -4,7 +4,8 @@
 from wtforms import (
     StringField, FileField,
     DateTimeField, SelectField,
-    TextAreaField
+    TextAreaField, IntegerField,
+    validators
 )
 from wtforms.validators import DataRequired, Optional
 
@@ -383,3 +384,29 @@ class UserAuthForm(BaseForm):
         p = UserInfoProcess(self._obj.user_id)
         p.save_auth_info(self.auth_type_list.data)
         return
+
+
+class UserEduInfoForm(BaseForm):
+    graduated = StringField(UserFields.GRADUATED)
+    education = IntegerField(UserFields.EDUCATION)
+    specialty = StringField(UserFields.SPECIALTY)
+
+    def save(self, uid):
+        process = UserProcess(uid)
+        keys = [_ for _ in self.data]
+        values = [_.data for _ in filter(lambda x: x.name != 'csrf_token', self)]
+        return process.add_edu_experience(dict(zip(keys, values)))
+
+
+class UserWorkInfoForm(BaseForm):
+    industry_id = IntegerField(UserFields.INDUSTRY)
+    company_name = StringField(UserFields.COMPANY_NAME, [validators.required()])
+    profession = StringField(UserFields.PROFESSION, [validators.required()])
+    income = IntegerField(UserFields.INCOME, [validators.required()])
+
+    def save(self, uid):
+        process = UserProcess(uid)
+        keys = [_ for _ in self.data]
+        values = [_.data for _ in filter(lambda x: x.name != 'csrf_token', self)]
+        return process.add_work_experience(dict(zip(keys, values)))
+

@@ -16,7 +16,7 @@ class DevMixin(object):
     SQLALCHEMY_POOL_RECYCLE = 3000
 
     RUN_ENV = 'dev'
-    DEBUG = False
+    DEBUG = True
     PROPAGATE_EXCEPTIONS = True
 
     # redis
