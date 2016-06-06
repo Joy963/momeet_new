@@ -1,12 +1,13 @@
 from flask import Blueprint, json, request, g
 from ._base import BaseView
-from momeet.lib import auth
 from momeet.models.user import (
     get_user,
     EduExperience,
     WorkExperience
 )
 from momeet.forms.user import (
+    UserForm,
+    UserInfoUpdateForm,
     UserAvatarForm,
     UserEduInfoForm,
     UserWorkInfoForm
@@ -19,6 +20,12 @@ class UserBaseInfo(BaseView):
     def get(self, uid):
         user = get_user(uid)
         return json.dumps(user.to_dict() if user else {})
+
+    def post(self, uid):
+        form = UserInfoUpdateForm(csrf_enabled=False)
+        if form.validate_on_submit() and form.save(uid):
+            return json.dumps({"success": True})
+        return json.dumps({"success": False})
 
 
 class UserAvatar(BaseView):
@@ -67,7 +74,7 @@ class UserWorkInfo(BaseView):
         return json.dumps({"success": False, "msg": "add work exprience failed"})
 
 
+bp.add_url_rule("avatar/<string:uid>", view_func=UserAvatar.as_view("avatar"))
 bp.add_url_rule("base_info/<string:uid>", view_func=UserBaseInfo.as_view("base_info"))
 bp.add_url_rule("edu_info/<string:uid>", view_func=UserEduInfo.as_view("edu_info"))
 bp.add_url_rule("work_info/<string:uid>", view_func=UserWorkInfo.as_view("work_info"))
-bp.add_url_rule("avatar/<string:uid>", view_func=UserAvatar.as_view("avatar"))

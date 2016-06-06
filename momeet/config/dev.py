@@ -34,5 +34,5 @@ class DevApiConfig(DevMixin, ApiConfig):
 
 class DevWebConfig(DevMixin, WebConfig):
     def __init__(self):
-        self.LOGGERS['momeet']['level'] = 'INFO'
+        self.LOGGERS['momeet']['level'] = 'DEBUG'
         self.LOGGERS['momeet']['file'] = './logs/dev/web.log'

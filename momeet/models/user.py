@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
+from flask_login import UserMixin
 import urllib2
 import cStringIO
 from itsdangerous import (
@@ -45,7 +46,7 @@ class Privilege(BaseModel):
     name = db.Column(db.String(50), default='')
 
 
-class User(BaseModel):
+class User(BaseModel, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     social_id = db.Column(db.String(100))  # openid
     wechat_union_id = db.Column(db.String(100))  # 微信唯一ID
@@ -132,7 +133,7 @@ class User(BaseModel):
 
 
 class WorkExperience(BaseModel):
-    dict_default_columns = []
+    dict_default_columns = ["company_name", "profession", "income", "industry_id"]
 
     id = db.Column(db.Integer, nullable=False, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -143,13 +144,13 @@ class WorkExperience(BaseModel):
 
 
 class EduExperience(BaseModel):
-    dict_default_columns = ["id", "graduated", "education", "specialty"]
+    dict_default_columns = ["id", "graduated", "education", "major"]
 
     id = db.Column(db.Integer, nullable=False, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     graduated = db.Column(db.String(100))  # 毕业院校
     education = db.Column(db.SmallInteger, default=0)  # 学历
-    specialty = db.Column(db.String(100))   # 专业
+    major = db.Column(db.String(100))   # 专业
 
 
 class UserInfo(BaseModel):

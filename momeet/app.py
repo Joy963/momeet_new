@@ -100,6 +100,8 @@ def create_app(test_config=None):
     app.init_config()
     app.init_loggers()
 
+    app.init_login()
+
     if test_config:
         app.config.update(test_config)
 

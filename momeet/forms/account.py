@@ -28,15 +28,15 @@ class NewUserForm(BaseForm):
     country = StringField(u'国家')
     head_img_url = StringField(u'头像', [validators.required()])
     union_id = StringField(u'用户统一标识', [validators.required()])
-    privilege = FieldList(StringField(u'特权'))
+    # privilege = FieldList(StringField(u'特权'))
 
     def __init__(self, *args, **kwargs):
         super(NewUserForm, self).__init__(*args, **kwargs)
 
     def save(self):
-        user = User.query.filter_by(social_id=self.openid.data).first()
-        if not user:
-            user = User()
+        if User.query.filter_by(social_id=self.openid.data).first():
+            return None
+        user = User()
         user.social_id = self.openid.data
         user.user_name = self.nickname.data
         user.gender = self.sex.data

@@ -5,7 +5,7 @@ from wtforms import (
     StringField, FileField,
     DateTimeField, SelectField,
     TextAreaField, IntegerField,
-    validators
+    validators, DateField
 )
 from wtforms.validators import DataRequired, Optional
 
@@ -31,7 +31,7 @@ from momeet.constants.user import (
 from momeet.constants.city import CITY_DATA
 from momeet.models.industry import get_all_industry, get_industry
 from momeet.models.user import (
-    get_user_by_name, User,
+    get_user, User,
     UserProcess,
     UserInfoProcess,
     UserInvitationProcess
@@ -65,13 +65,13 @@ class UserForm(BaseForm):
         ],
     )
 
-    def validate_user_name(self, field):
-        name = field.data.strip().lower()
-        u = get_user_by_name(name)
-        if not self._obj and u:
-            raise ValueError(ErrorsEnum.USER_NAME_EXISTS.describe())
-        if self._obj and self._obj.user_name != name and u:
-            raise ValueError(ErrorsEnum.USER_NAME_EXISTS.describe())
+    # def validate_user_name(self, field):
+    #     name = field.data.strip().lower()
+    #     u = get_user_by_name(name)
+    #     if not self._obj and u:
+    #         raise ValueError(ErrorsEnum.USER_NAME_EXISTS.describe())
+    #     if self._obj and self._obj.user_name != name and u:
+    #         raise ValueError(ErrorsEnum.USER_NAME_EXISTS.describe())
 
     real_name = StringField(
         UserFields.REAL_NAME,
@@ -270,6 +270,65 @@ class UserForm(BaseForm):
         return user
 
 
+class UserInfoUpdateForm(BaseForm):
+    user_name = StringField(UserFields.USER_NAME)
+    real_name = StringField(UserFields.REAL_NAME)
+    id_card = StringField(UserFields.ID_CARD)
+    gender = RadioField(UserFields.GENDER, default=str(UserGender.MAN.value))
+    birthday = DateField(UserFields.BIRTHDAY)
+    height = IntegerField(UserFields.HEIGHT)
+    mobile_num = StringField(UserFields.MOBILE_NUM)
+    weixin_num = StringField(UserFields.WEIXIN_NUM)
+    location = StringField(UserFields.LOCATION)
+    industry = IntegerField(UserFields.INDUSTRY)
+    company_name = StringField(UserFields.COMPANY_NAME)
+    profession = StringField(UserFields.PROFESSION)
+    affection = IntegerField(UserFields.AFFECTION)
+    income = IntegerField(UserFields.INCOME)
+    graduated = StringField(UserFields.GRADUATED)
+    education = IntegerField(UserFields.EDUCATION)
+    hometown = StringField(UserFields.HOMETOWN)
+    drink = IntegerField(UserFields.DRINK)
+    smoke = IntegerField(UserFields.SMOKE)
+    constellation = IntegerField(UserFields.CONSTELLATION)
+    religion = IntegerField(UserFields.RELIGION)
+
+    def init_choices(self):
+        self.gender.choices = [(str(_.value), _.describe()) for _ in [UserGender.MAN, UserGender.WOMAN]]
+        # self.industry.choices = [(0, ('0', u'请选择'))]
+        # self.industry.default = '0'
+        #
+        field_dict = {
+            # 'affection': UserAffection,
+            # 'education': EducationStatus,
+            # 'income': IncomeStatus,
+            # 'drink': DrinkStatus,
+            # 'smoke': SmokeStatus,
+            # 'religion': ReligionEnum,
+            # 'constellation': ConstellationEnum
+        }
+
+        for f in field_dict:
+            field = getattr(self, f)
+            _enum = field_dict.get(f)
+            _choices = [(str(_.value), _.describe()) for _ in sorted(_enum.__members__.values())]
+            _choices.insert(0, ('0', u'请选择'))
+            field.choices = _choices
+            field.default = '0'
+
+    def __init__(self, *args, **kwargs):
+        super(UserInfoUpdateForm, self).__init__(*args, **kwargs)
+        self.init_choices()
+
+    def save(self, uid):
+        user = get_user(uid)
+        if not user:
+            return False
+        for k, v in self.data.items():
+            setattr(user, k, v)
+        return user.save()
+
+
 class UserPhotoForm(BaseForm):
     photo = FileField(
         UserFields.PHOTO
@@ -389,7 +448,7 @@ class UserAuthForm(BaseForm):
 class UserEduInfoForm(BaseForm):
     graduated = StringField(UserFields.GRADUATED)
     education = IntegerField(UserFields.EDUCATION)
-    specialty = StringField(UserFields.SPECIALTY)
+    major = StringField(UserFields.SPECIALTY)
 
     def save(self, uid):
         process = UserProcess(uid)
@@ -399,7 +458,7 @@ class UserEduInfoForm(BaseForm):
 
 
 class UserWorkInfoForm(BaseForm):
-    industry_id = IntegerField(UserFields.INDUSTRY)
+    industry = IntegerField(UserFields.INDUSTRY)
     company_name = StringField(UserFields.COMPANY_NAME, [validators.required()])
     profession = StringField(UserFields.PROFESSION, [validators.required()])
     income = IntegerField(UserFields.INCOME, [validators.required()])
