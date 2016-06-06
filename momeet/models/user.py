@@ -157,6 +157,13 @@ class EduExperience(BaseModel):
     major = db.Column(db.String(100))   # 专业
 
 
+class UserPhoto(BaseModel):
+    id = db.Column(db.Integer, nullable=False, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    photo = db.Column(db.String(3000))
+    is_active = db.Column(db.Boolean, default=True)
+
+
 class UserInfo(BaseModel):
     user_id = db.Column(db.Integer, nullable=False, primary_key=True)
     photos = db.Column(db.String(3000))  # 照片
@@ -223,8 +230,7 @@ class UserProcess(object):
         if not self.user:
             return False
         self.user.avatar = avatar_uri
-        db.session.add(self.user)
-        db.session.commit()
+        self.user.save()
         return avatar_uri
 
     def add_edu_experience(self, d):
@@ -250,26 +256,26 @@ class UserInfoProcess(object):
         self.user_id = user_id
 
     def get_photos(self):
-        info = get_user_info(self.user_id)
-        return info.photos or []
+        return map(lambda x: x.photo, UserPhoto.query.filter_by(
+            user_id=self.user_id, is_active=True).all())
 
     def _process_photo(self, process_name, photo):
         if not photo:
             return
         photos = self.get_photos()
         modify = False
-        if process_name == 'add':
-            if photo not in photos:
-                photos.append(photo)
-                modify = True
-        else:
-            if photo in photos:
-                photos.remove(photo)
-                modify = True
+        if process_name == 'add' and photo not in photos:
+            photos.append(photo)
+            modify = True
+        if process_name == 'del' and photo in photos:
+            photos.remove(photo)
+            modify = True
+
         if modify:
-            info = get_user_info(self.user_id)
-            info.photos = photos
-            info.save()
+            for photo in photos:
+                u_p = UserPhoto(user_id=self.user_id)
+                u_p.photo = photo
+                u_p.save()
         return photos
 
     def add_photo(self, photo):

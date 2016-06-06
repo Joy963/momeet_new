@@ -19,8 +19,11 @@ def user_loader(uid):
 
 class UserExistCheck(BaseView):
     def post(self):
-        data = json.loads(request.data)
-        return json.dumps({"success": get_user(data.get('openid')) is not None})
+        form = UserSocialIdForm(csrf_enabled=False)
+        if form.validate_on_submit():
+            form.openid_check(form.openid.data)
+            return json.dumps({"success": form.openid_check(form.openid.data)})
+        return json.dumps({"success": False})
 
 
 class UserSignIn(BaseView):

@@ -110,6 +110,9 @@ class UserPhotoView(BaseView):
             abort(404)
         process = UserInfoProcess(user_id)
         photos = process.get_photos()
+        print '########'
+        print photos
+        print '###########'
         form = UserPhotoForm()
         return render_template(self.template_name, photos=photos, form=form, user=user)
 
