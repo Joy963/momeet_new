@@ -19,7 +19,7 @@ bp = Blueprint('user_info', __name__)
 class UserBaseInfo(BaseView):
     def get(self, uid):
         user = get_user(uid)
-        return json.dumps(user.to_dict() if user else {})
+        return json.dumps(user.to_dict_ext() if user else {})
 
     def post(self, uid):
         form = UserInfoUpdateForm(csrf_enabled=False)

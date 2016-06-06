@@ -3,21 +3,23 @@
 
 from datetime import datetime
 from flask_login import UserMixin
-import urllib2
-import cStringIO
-from itsdangerous import (
-    TimedJSONWebSignatureSerializer as Serializer,
-    BadSignature,
-    SignatureExpired
-)
+# import urllib2
+# import cStringIO
+# from itsdangerous import (
+#     TimedJSONWebSignatureSerializer as Serializer,
+#     BadSignature,
+#     SignatureExpired
+# )
 from momeet.lib import (
     BaseModel, db
 )
-from momeet.utils import utf8
+from momeet.models.industry import get_industry
+# from momeet.constants.user import *
+# from momeet.utils import utf8
 from momeet.lib import session_scope
-from momeet.utils import FancyDict, safe_int
-from momeet.utils.upload import save_avatar_to_qiniu
-from momeet.config import c
+from momeet.utils import utf8, FancyDict, safe_int
+# from momeet.utils.upload import save_avatar_to_qiniu
+# from momeet.config import c
 
 
 USER_PER_PAGE_COUNT = 20
@@ -70,9 +72,10 @@ class User(BaseModel, UserMixin):
     profession = db.Column(db.String(100))  # 职位
     income = db.Column(db.SmallInteger, default=0)  # 年收入
 
-    affection = db.Column(db.SmallInteger, default=0)  # 感情状况
     graduated = db.Column(db.String(100))  # 毕业院校
     education = db.Column(db.SmallInteger, default=0)  # 学历
+
+    affection = db.Column(db.SmallInteger, default=0)  # 感情状况
     hometown = db.Column(db.String(100), default='0,0')  # 家乡
 
     drink = db.Column(db.SmallInteger, default=0)  # 是否喝酒
@@ -82,11 +85,10 @@ class User(BaseModel, UserMixin):
 
     is_active = db.Column(db.Boolean, default=True)
     created = db.Column(db.DateTime, default=datetime.now)
-    dict_default_columns = ['avatar', 'real_name', 'gender',
-                            'birthday', 'height', 'location', 'affection',
-                            'mobile_num', 'weixin_num', 'industry_id',
-                            'income', 'hometown', 'constellation',
-                            'drink', 'smoke']
+    dict_default_columns = ['avatar', 'real_name', 'gender', 'user_name', 'id_card',
+                            'birthday', 'age', 'height', 'location', 'affection',
+                            'mobile_num', 'weixin_num', 'country', 'drink', 'smoke',
+                            'hometown', 'constellation', 'religion', 'created']
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -97,40 +99,41 @@ class User(BaseModel, UserMixin):
     def __repr__(self):
         return utf8('<User: %s>' % self.user_name)
 
-    def generate_auth_token(self, expiration=600):
-        s = Serializer(c.SECRET_KEY, expires_in=expiration)
-        return s.dumps({'social_id': self.social_id})
+    def to_dict_ext(self, columns=None):
+        d = self.to_dict(columns=columns)
+        industry = get_industry(self.industry_id)
+        d['industry'] = industry.name if industry else ''
+        d['work_expirence'] = map(lambda x: x.to_dict(), WorkExperience.query.filter_by(user_id=self.id).all())
+        d['edu_expirence'] = map(lambda x: x.to_dict(), EduExperience.query.filter_by(user_id=self.id).all())
+        # for k, v in d.items():
+        #     if k == 'affection':
+        #         d[k] = USER_AFFECTION_DESC.get(v)
+        #     if k == 'constellation':
+        #         d[k] = CONSTELLATION_DESC.get(v)
+        #     if k == 'drink':
+        #         d[k] = DRINK_STATUS_DESC.get(v)
+        #     if k == 'gender':
+        #         d[k] = USER_GENDER_DESC.get(v)
+        #     if k == 'income':
+        #         d[k] = INCOME_STATUS_DESC.get(v)
+        #     if k == 'smoke':
+        #         d[k] = SMOKE_STATUS_DESC.get(v)
+        return d
 
-    @staticmethod
-    def verify_auth_token(token):
-        s = Serializer(c.SECRET_KEY)
-        try:
-            data = s.loads(token)
-        except SignatureExpired:
-            return None
-        except BadSignature:
-            return None
-        return get_user_by_social_id(data['social_id'])
-
-    @classmethod
-    def create_or_update(cls, **kwargs):
-        user = cls.query.filter_by(social_id=kwargs.get("openid")).first() or User()
-        user.social_id = kwargs.get("openid")
-        user.user_name = kwargs.get("nickname")
-        head_img_url = kwargs.get("head_img_url")
-        file_data = cStringIO.StringIO(urllib2.urlopen(head_img_url).read())
-        file_name = user.social_id + ".jpg"
-
-        user.avatar = save_avatar_to_qiniu(file_name, file_data)
-        user.wechat_union_id = kwargs.get("union_id")
-
-        user.gender = kwargs.get("sex")
-        user.location = "{},{}".format(kwargs.get("province"),
-                                       kwargs.get("province"))
-        user.country = kwargs.get("country")
-        db.session.add(user)
-        db.session.commit()
-        return user
+    # def generate_auth_token(self, expiration=600):
+    #     s = Serializer(c.SECRET_KEY, expires_in=expiration)
+    #     return s.dumps({'social_id': self.social_id})
+    #
+    # @staticmethod
+    # def verify_auth_token(token):
+    #     s = Serializer(c.SECRET_KEY)
+    #     try:
+    #         data = s.loads(token)
+    #     except SignatureExpired:
+    #         return None
+    #     except BadSignature:
+    #         return None
+    #     return get_user_by_social_id(data['social_id'])
 
 
 class WorkExperience(BaseModel):

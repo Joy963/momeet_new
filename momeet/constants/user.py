@@ -5,9 +5,9 @@ from enum import IntEnum
 
 
 class UserGender(IntEnum):
-    WOMAN = 0
-    MAN = 1
-    UNKNOWN = -1
+    UNKNOWN = 0
+    WOMAN = 1
+    MAN = 2
 
     def describe(self):
         return USER_GENDER_DESC.get(self.value, '')

@@ -4,7 +4,7 @@
 CITY_DATA = [
     {
         'id': 0, 'name': '请选择', 'cities': [
-            {'id':0, 'name': ''},
+            {'id': 0, 'name': ''},
         ]
     },
     {
