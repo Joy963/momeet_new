@@ -274,7 +274,7 @@ class UserInfoUpdateForm(BaseForm):
     user_name = StringField(UserFields.USER_NAME)
     real_name = StringField(UserFields.REAL_NAME)
     id_card = StringField(UserFields.ID_CARD)
-    gender = RadioField(UserFields.GENDER, default=str(UserGender.MAN.value))
+    gender = IntegerField(UserFields.GENDER)
     birthday = DateField(UserFields.BIRTHDAY)
     height = IntegerField(UserFields.HEIGHT)
     mobile_num = StringField(UserFields.MOBILE_NUM)
@@ -294,7 +294,7 @@ class UserInfoUpdateForm(BaseForm):
     religion = IntegerField(UserFields.RELIGION)
 
     def init_choices(self):
-        self.gender.choices = [(str(_.value), _.describe()) for _ in [UserGender.MAN, UserGender.WOMAN]]
+        # self.gender.choices = [(str(_.value), _.describe()) for _ in [UserGender.MAN, UserGender.WOMAN]]
         # self.industry.choices = [(0, ('0', u'请选择'))]
         # self.industry.default = '0'
         #
@@ -324,9 +324,9 @@ class UserInfoUpdateForm(BaseForm):
         user = get_user(uid)
         if not user:
             return False
-        for k, v in self.data.items():
-            if not v:
-                setattr(user, k, v)
+        for k in self.data.keys():
+            if self.data.get(k):
+                setattr(user, k, self.data.get(k))
         return user.save()
 
 
