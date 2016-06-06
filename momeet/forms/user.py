@@ -325,7 +325,8 @@ class UserInfoUpdateForm(BaseForm):
         if not user:
             return False
         for k, v in self.data.items():
-            setattr(user, k, v)
+            if not v:
+                setattr(user, k, v)
         return user.save()
 
 

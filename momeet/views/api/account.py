@@ -52,7 +52,7 @@ class UserLogout(BaseView):
 class TestView(BaseView):
     @login_required
     def get(self):
-        return "Api View Test!"
+        return "<h1>Api View Test!</h1>"
 
 
 bp.add_url_rule("user/check", view_func=UserExistCheck.as_view("user.check"))

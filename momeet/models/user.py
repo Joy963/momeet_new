@@ -85,7 +85,8 @@ class User(BaseModel, UserMixin):
     dict_default_columns = ['avatar', 'real_name', 'gender',
                             'birthday', 'height', 'location', 'affection',
                             'mobile_num', 'weixin_num', 'industry_id',
-                            'income', 'hometown', 'constellation']
+                            'income', 'hometown', 'constellation',
+                            'drink', 'smoke']
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
