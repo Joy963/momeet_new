@@ -1,9 +1,6 @@
-from flask import Blueprint, json, request, g
+from flask import Blueprint, jsonify
 from ._base import BaseView
-from momeet.models.user import (
-    get_user,
-    User
-)
+from momeet.models.user import get_user
 from momeet.lib import lm
 from momeet.forms.account import UserSocialIdForm
 from momeet.forms.account import NewUserForm
@@ -22,8 +19,8 @@ class UserExistCheck(BaseView):
         form = UserSocialIdForm(csrf_enabled=False)
         if form.validate_on_submit():
             form.openid_check(form.openid.data)
-            return json.dumps({"success": form.openid_check(form.openid.data)})
-        return json.dumps({"success": False})
+            return jsonify({"success": form.openid_check(form.openid.data)})
+        return jsonify({"success": False})
 
 
 class UserSignIn(BaseView):
@@ -32,8 +29,8 @@ class UserSignIn(BaseView):
         if form.validate_on_submit():
             user = form.save()
             if user:
-                return json.dumps({"success": True, "uid": user.id})
-        return json.dumps({"success": False})
+                return jsonify({"success": True, "uid": user.id})
+        return jsonify({"success": False})
 
 
 class UserLogin(BaseView):
@@ -43,13 +40,13 @@ class UserLogin(BaseView):
             user = get_user(form.openid.data)
             if user:
                 login_user(user)
-                return json.dumps({"success": True, "uid": user.id})
-        return json.dumps({"success": False})
+                return jsonify({"success": True, "uid": user.id})
+        return jsonify({"success": False})
 
 
 class UserLogout(BaseView):
     def post(self):
-        return json.dumps({"success": logout_user()})
+        return jsonify({"success": logout_user()})
 
 
 class TestView(BaseView):

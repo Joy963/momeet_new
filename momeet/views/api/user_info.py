@@ -1,4 +1,4 @@
-from flask import Blueprint, json, request, g
+from flask import Blueprint, jsonify
 from ._base import BaseView
 from momeet.models.user import (
     get_user,
@@ -19,13 +19,13 @@ bp = Blueprint('user_info', __name__)
 class UserBaseInfo(BaseView):
     def get(self, uid):
         user = get_user(uid)
-        return json.dumps(user.to_dict_ext() if user else {})
+        return jsonify(user.to_dict_ext() if user else {})
 
     def post(self, uid):
         form = UserInfoUpdateForm(csrf_enabled=False)
         if form.validate_on_submit() and form.save(uid):
-            return json.dumps({"success": True})
-        return json.dumps({"success": False})
+            return jsonify({"success": True})
+        return jsonify({"success": False})
 
 
 class UserAvatar(BaseView):
@@ -34,44 +34,44 @@ class UserAvatar(BaseView):
         if form.validate_on_submit():
             avatar_uri = form.save(uid)
             if avatar_uri:
-                return json.dumps({"success": True, "avatar": avatar_uri})
-        return json.dumps({"success": False, "msg": "failed update avatar!"})
+                return jsonify({"success": True, "avatar": avatar_uri})
+        return jsonify({"success": False, "msg": "failed update avatar!"})
 
 
 class UserEduInfo(BaseView):
     def get(self, uid):
         user = get_user(uid)
         if not user:
-            return json.dumps({"success": False, "msg": "invalid uid or openid!"})
+            return jsonify({"success": False, "msg": "invalid uid or openid!"})
         edus = EduExperience.query.filter_by(user_id=user.id)
-        return json.dumps({"success": True, "results": [_.to_dict() for _ in edus]})
+        return jsonify({"success": True, "results": [_.to_dict() for _ in edus]})
 
     def post(self, uid):
         user = get_user(uid)
         if not user:
-            return json.dumps({"success": False, "msg": "invalid uid or openid!"})
+            return jsonify({"success": False, "msg": "invalid uid or openid!"})
         form = UserEduInfoForm(csrf_enabled=False)
         if form.validate_on_submit() and form.save(uid):
-            return json.dumps({"success": True, "msg": "add edu exprience success"})
-        return json.dumps({"success": False, "msg": "add edu exprience failed"})
+            return jsonify({"success": True, "msg": "add edu exprience success"})
+        return jsonify({"success": False, "msg": "add edu exprience failed"})
 
 
 class UserWorkInfo(BaseView):
     def get(self, uid):
         user = get_user(uid)
         if not user:
-            return json.dumps({"success": False, "msg": "invalid uid or openid!"})
+            return jsonify({"success": False, "msg": "invalid uid or openid!"})
         works = WorkExperience.query.filter_by(user_id=user.id)
-        return json.dumps({"success": True, "results": [_.to_dict() for _ in works]})
+        return jsonify({"success": True, "results": [_.to_dict() for _ in works]})
 
     def post(self, uid):
         user = get_user(uid)
         if not user:
-            return json.dumps({"success": False, "msg": "invalid uid or openid!"})
+            return jsonify({"success": False, "msg": "invalid uid or openid!"})
         form = UserWorkInfoForm(csrf_enabled=False)
         if form.validate_on_submit() and form.save(uid):
-            return json.dumps({"success": True, "msg": "add work exprience success"})
-        return json.dumps({"success": False, "msg": "add work exprience failed"})
+            return jsonify({"success": True, "msg": "add work exprience success"})
+        return jsonify({"success": False, "msg": "add work exprience failed"})
 
 
 bp.add_url_rule("avatar/<string:uid>", view_func=UserAvatar.as_view("avatar"))

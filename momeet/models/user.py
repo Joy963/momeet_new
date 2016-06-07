@@ -259,30 +259,37 @@ class UserInfoProcess(object):
         return map(lambda x: x.photo, UserPhoto.query.filter_by(
             user_id=self.user_id, is_active=True).all())
 
-    def _process_photo(self, process_name, photo):
-        if not photo:
-            return
-        photos = self.get_photos()
-        modify = False
-        if process_name == 'add' and photo not in photos:
-            photos.append(photo)
-            modify = True
-        if process_name == 'del' and photo in photos:
-            photos.remove(photo)
-            modify = True
-
-        if modify:
-            for photo in photos:
-                u_p = UserPhoto(user_id=self.user_id)
-                u_p.photo = photo
-                u_p.save()
-        return photos
+    # def _process_photo(self, process_name, photo):
+    #     if not photo:
+    #         return
+    #     photos = self.get_photos()
+    #     modify = False
+    #     if process_name == 'add' and photo not in photos:
+    #         photos.append(photo)
+    #         modify = True
+    #     if process_name == 'del' and photo in photos:
+    #         photos.remove(photo)
+    #         modify = True
+    #
+    #     if modify:
+    #         for photo in photos:
+    #             u_p = UserPhoto(user_id=self.user_id)
+    #             u_p.photo = photo
+    #             u_p.save()
+    #     return photos
 
     def add_photo(self, photo):
-        return self._process_photo('add', photo)
+        u_p = UserPhoto(user_id=self.user_id)
+        u_p.photo = photo
+        u_p.save()
+        return u_p
 
     def del_photo(self, photo):
-        return self._process_photo('del', photo)
+        u_p = UserPhoto.query.filter_by(
+            user_id=self.user_id, photo=photo).first()
+        u_p.is_active = False
+        u_p.save()
+        return u_p
 
     def get_auth_info(self):
         info = get_user_info(self.user_id)

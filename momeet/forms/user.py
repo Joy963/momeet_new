@@ -384,6 +384,7 @@ class UserDetailForm(BaseForm):
         if self.detail.data:
             clear_obj = ClearElement(self.detail.data)
             content = utf8(clear_obj.clearup_content())
+            print content
             info.detail = content
         info.save()
         return info
