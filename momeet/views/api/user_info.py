@@ -6,7 +6,6 @@ from momeet.models.user import (
     WorkExperience
 )
 from momeet.forms.user import (
-    UserForm,
     UserInfoUpdateForm,
     UserAvatarForm,
     UserEduInfoForm,

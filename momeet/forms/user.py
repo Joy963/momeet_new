@@ -283,19 +283,7 @@ class UserInfoUpdateForm(BaseForm):
     religion = IntegerField(UserFields.RELIGION)
 
     def init_choices(self):
-        # self.gender.choices = [(str(_.value), _.describe()) for _ in [UserGender.MAN, UserGender.WOMAN]]
-        # self.industry.choices = [(0, ('0', u'请选择'))]
-        # self.industry.default = '0'
-        #
-        field_dict = {
-            # 'affection': UserAffection,
-            # 'education': EducationStatus,
-            # 'income': IncomeStatus,
-            # 'drink': DrinkStatus,
-            # 'smoke': SmokeStatus,
-            # 'religion': ReligionEnum,
-            # 'constellation': ConstellationEnum
-        }
+        field_dict = {}
 
         for f in field_dict:
             field = getattr(self, f)

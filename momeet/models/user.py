@@ -90,7 +90,7 @@ class User(BaseModel, UserMixin):
                             'birthday', 'age', 'height', 'location', 'affection',
                             'mobile_num', 'weixin_num', 'country', 'drink', 'smoke',
                             'hometown', 'constellation', 'religion', 'created',
-                            'income']
+                            'income', 'social_id', 'wechat_union_id', 'id']
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
