@@ -14,6 +14,7 @@ class InvitationCode(BaseModel):
     """
     邀请码
     """
+    dict_default_columns = ['code', 'is_used', 'created']
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(7), unique=True, index=True, nullable=False)  # 邀请码
     is_used = db.Column(db.Boolean, default=False)  # 是否使用

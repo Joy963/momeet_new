@@ -1,9 +1,7 @@
-from flask import Blueprint, request, json
+from flask import Blueprint, request, jsonify
 from ._base import BaseView
-from momeet.models.invitation import (
-    create_invitation_code,
-    code_check
-)
+from momeet.forms.invitation import InvitationCodeForm
+from momeet.models.invitation import create_invitation_code
 
 
 bp = Blueprint('invitation', __name__)
@@ -12,14 +10,15 @@ bp = Blueprint('invitation', __name__)
 class GetInvitationCode(BaseView):
     def get(self):
         code = create_invitation_code()
-        return json.dumps({"code": code.to_dict(
-            ['id', 'code', 'is_used', 'created']), "success": True})
+        return jsonify({"code": code.to_dict(), "success": True})
 
 
 class InvitationCodeCheck(BaseView):
     def post(self):
-        data = json.loads(request.data)
-        return json.dumps({"success": code_check(data.get('code'))})
+        form = InvitationCodeForm(csrf_enabled=False)
+        if form.validate_on_submit():
+            return jsonify({"success": form.code_check()})
+        return jsonify({"success": False})
 
 
 bp.add_url_rule("check/", view_func=InvitationCodeCheck.as_view("invitation.check"))

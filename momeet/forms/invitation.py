@@ -12,7 +12,7 @@ class InvitationCodeForm(BaseForm):
     def __init__(self, *args, **kwargs):
         super(InvitationCodeForm, self).__init__(*args, **kwargs)
 
-    @staticmethod
-    def code_check(code):
-        return InvitationCode.query.filter_by(code=code).first() is not None
+    def code_check(self):
+        code = InvitationCode.query.filter_by(code=self.code.data).first()
+        return not code.is_used if code else False
 
