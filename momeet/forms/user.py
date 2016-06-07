@@ -16,26 +16,15 @@ from momeet.utils.view import (
     CustomQuerySelectField as QuerySelectField,
     MultiCheckboxField
 )
-from momeet.constants.user import (
-    UserGender,
-    UserAffection,
-    IncomeStatus,
-    SmokeStatus,
-    DrinkStatus,
-    EducationStatus,
-    ReligionEnum,
-    ConstellationEnum,
-    InvitationTypeEnum,
-    AuthTypeEnum
-)
+from momeet.constants.user import *
 from momeet.constants.city import CITY_DATA
 from momeet.models.industry import get_all_industry, get_industry
 from momeet.models.user import (
     get_user, User,
     UserProcess,
     UserInfoProcess,
-    UserInvitationProcess
 )
+from momeet.models.engagement import Engagement
 from momeet.utils import safe_int, ClearElement, logger, utf8
 from momeet.utils.upload import save_upload_file_to_qiniu, allowed_file
 
@@ -384,46 +373,10 @@ class UserDetailForm(BaseForm):
         if self.detail.data:
             clear_obj = ClearElement(self.detail.data)
             content = utf8(clear_obj.clearup_content())
-            print content
+            print
             info.detail = content
         info.save()
         return info
-
-
-class UserInvitationForm(BaseForm):
-    invitation_type = MultiCheckboxField(
-        UserFields.INVITATION_TYPE
-    )
-
-    def validate_invitation_type(self, field):
-        if not field.data:
-            raise ValueError(ErrorsEnum.INVITATION_TYPE_REQUIRED.describe())
-
-
-    description = TextAreaField(
-        UserFields.INVITATION_DESC
-    )
-
-    price = StringField(
-        UserFields.INVITATION_PRICE
-    )
-
-    def __init__(self, *args, **kwargs):
-        super(UserInvitationForm, self).__init__(*args, **kwargs)
-        _choices = [
-            (str(_.value), _.describe())
-            for _ in sorted(InvitationTypeEnum.__members__.values())
-        ]
-        self.invitation_type.choices = _choices
-        if self._obj and self._obj.invitation_type_list:
-            self.invitation_type.checked_list = [int(_) for _ in self._obj.invitation_type_list]
-
-    def save(self):
-        logger.debug(self.description.data)
-        logger.debug(self.invitation_type.data)
-        p = UserInvitationProcess(self._obj.user_id)
-        p.save_invitation(self.invitation_type.data, self.price.data, self.description.data.strip())
-        return
 
 
 class UserAuthForm(BaseForm):

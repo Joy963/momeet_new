@@ -21,5 +21,5 @@ class InvitationCodeCheck(BaseView):
         return jsonify({"success": False})
 
 
-bp.add_url_rule("check/", view_func=InvitationCodeCheck.as_view("invitation.check"))
-bp.add_url_rule("code/", view_func=GetInvitationCode.as_view("code.get"))
+bp.add_url_rule("check/", view_func=InvitationCodeCheck.as_view("check"))
+bp.add_url_rule("code/", view_func=GetInvitationCode.as_view("code"))

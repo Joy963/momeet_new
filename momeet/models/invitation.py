@@ -39,10 +39,6 @@ def create_invitation_code():
     return invitation_code
 
 
-def code_check(code):
-    return InvitationCode.query.filter_by(code=code).first() is not None
-
-
 def get_invitation_code(code):
     if str(code).isdigit():
         return InvitationCode.query.get(code)

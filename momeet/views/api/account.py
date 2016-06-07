@@ -55,8 +55,8 @@ class TestView(BaseView):
         return "<h1>Api View Test!</h1>"
 
 
-bp.add_url_rule("user/check", view_func=UserExistCheck.as_view("user.check"))
-bp.add_url_rule("user/signin", view_func=UserSignIn.as_view("user.signin"))
-bp.add_url_rule("user/login", view_func=UserLogin.as_view("user.login"))
-bp.add_url_rule("user/logout", view_func=UserLogout.as_view("user.logout"))
+bp.add_url_rule("user/check", view_func=UserExistCheck.as_view("check"))
+bp.add_url_rule("user/signin", view_func=UserSignIn.as_view("signin"))
+bp.add_url_rule("user/login", view_func=UserLogin.as_view("login"))
+bp.add_url_rule("user/logout", view_func=UserLogout.as_view("logout"))
 bp.add_url_rule("test", view_func=TestView.as_view("test"))

@@ -14,9 +14,9 @@ class UserGender(IntEnum):
 
 
 USER_GENDER_DESC = {
-    UserGender.WOMAN.value: u'女',
-    UserGender.MAN.value: u'男',
-    UserGender.UNKNOWN.value: u'未知',
+    UserGender.WOMAN: u'女',
+    UserGender.MAN: u'男',
+    UserGender.UNKNOWN: u'未知',
 }
 
 
@@ -32,12 +32,12 @@ class UserAffection(IntEnum):
         return USER_AFFECTION_DESC.get(self.value, '')
 
 USER_AFFECTION_DESC = {
-    UserAffection.SINGLE.value: u'单身并享受单身的状态',
-    UserAffection.SINGLE1.value: u'单身但渴望找到另一半',
-    UserAffection.IN_LOVE.value: u'已有男女朋友，但未婚',
-    UserAffection.MARRIED.value: u'已婚',
-    UserAffection.DIVORCED.value: u'离异，寻觅中',
-    UserAffection.LOST_SPOUSE.value: u'丧偶，寻觅中',
+    UserAffection.SINGLE: u'单身并享受单身的状态',
+    UserAffection.SINGLE1: u'单身但渴望找到另一半',
+    UserAffection.IN_LOVE: u'已有男女朋友，但未婚',
+    UserAffection.MARRIED: u'已婚',
+    UserAffection.DIVORCED: u'离异，寻觅中',
+    UserAffection.LOST_SPOUSE: u'丧偶，寻觅中',
 }
 
 

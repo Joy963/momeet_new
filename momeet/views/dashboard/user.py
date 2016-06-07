@@ -10,8 +10,10 @@ from flask import (
 from momeet.models.user import (
     get_user_list_by_page, USER_PER_PAGE_COUNT,
     get_user, UserInfoProcess, get_user_info,
-    UserInvitationProcess
+    # UserInvitationProcess
 )
+
+from momeet.models.engagement import UserEngagementProcess
 
 from momeet.utils import safe_int, Pagination, flash
 from momeet.constants.user import (
@@ -24,9 +26,11 @@ from ._base import BaseView, FlagView
 from momeet.forms.user import (
     UserForm, UserPhotoForm,
     UserDetailForm,
-    UserInvitationForm,
+    # UserInvitationForm,
     UserAuthForm
 )
+
+from momeet.forms.engagement import EngagementForm
 
 bp = Blueprint('dashboard.user', __name__)
 
@@ -167,35 +171,28 @@ class UserDetailView(BaseView):
             return render_template(self.template_name, form=form)
 
 
-class UserInvitationView(BaseView):
+class UserEngagementView(BaseView):
     template_name = "dashboard/user/invitation.html"
 
-    def check(self, user_id):
-        user = get_user(user_id)
-        if not user:
-            abort(404)
-        p = UserInvitationProcess(user_id)
-        _obj = p.get_all_invitation_dict()
-        return user, _obj
-
     def get(self, user_id):
-        user, _obj = self.check(user_id)
-        form = UserInvitationForm(obj=_obj)
+        user = get_user(user_id)
+        _obj = UserEngagementProcess(user_id).get_all_engagement_dict()
+        form = EngagementForm(obj=_obj)
         return render_template(
             self.template_name,
             form=form,
-            user=user
-        )
+            user=user)
 
     def post(self, user_id):
-        user, _obj = self.check(user_id)
-        form = UserInvitationForm(obj=_obj)
+        user = get_user(user_id)
+        _obj = UserEngagementProcess(user_id).get_all_engagement_dict()
+        form = EngagementForm(obj=_obj)
         if form.validate_on_submit():
             form.save()
             flash(u"修改成功", level='success')
             return redirect(url_for('dashboard.user.invitation', user_id=user_id))
         else:
-            return render_template(self.template_name, form=form,user=user)
+            return render_template(self.template_name, form=form, user=user)
 
 
 class UserAuthView(BaseView):
@@ -234,5 +231,5 @@ bp.add_url_rule("<int:res_id>/", view_func=UserView.as_view("item"))
 bp.add_url_rule("<int:user_id>/photos/", view_func=UserPhotoView.as_view("photos"))
 bp.add_url_rule("<int:user_id>/photo/delete/", view_func=UserPhotoDelView.as_view("photo.delete"))
 bp.add_url_rule("<int:user_id>/detail/", view_func=UserDetailView.as_view("detail"))
-bp.add_url_rule("<int:user_id>/invitation/", view_func=UserInvitationView.as_view("invitation"))
+bp.add_url_rule("<int:user_id>/invitation/", view_func=UserEngagementView.as_view("invitation"))
 bp.add_url_rule("<int:user_id>/auth/", view_func=UserAuthView.as_view("auth"))

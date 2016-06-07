@@ -14,6 +14,7 @@ from momeet.lib import (
     BaseModel, db
 )
 from momeet.models.industry import get_industry
+from momeet.models.engagement import Engagement
 # from momeet.constants.user import *
 # from momeet.utils import utf8
 from momeet.lib import session_scope
@@ -88,7 +89,8 @@ class User(BaseModel, UserMixin):
     dict_default_columns = ['avatar', 'real_name', 'gender', 'user_name', 'id_card',
                             'birthday', 'age', 'height', 'location', 'affection',
                             'mobile_num', 'weixin_num', 'country', 'drink', 'smoke',
-                            'hometown', 'constellation', 'religion', 'created']
+                            'hometown', 'constellation', 'religion', 'created',
+                            'income']
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -105,35 +107,7 @@ class User(BaseModel, UserMixin):
         d['industry'] = industry.name if industry else ''
         d['work_expirence'] = map(lambda x: x.to_dict(), WorkExperience.query.filter_by(user_id=self.id).all())
         d['edu_expirence'] = map(lambda x: x.to_dict(), EduExperience.query.filter_by(user_id=self.id).all())
-        # for k, v in d.items():
-        #     if k == 'affection':
-        #         d[k] = USER_AFFECTION_DESC.get(v)
-        #     if k == 'constellation':
-        #         d[k] = CONSTELLATION_DESC.get(v)
-        #     if k == 'drink':
-        #         d[k] = DRINK_STATUS_DESC.get(v)
-        #     if k == 'gender':
-        #         d[k] = USER_GENDER_DESC.get(v)
-        #     if k == 'income':
-        #         d[k] = INCOME_STATUS_DESC.get(v)
-        #     if k == 'smoke':
-        #         d[k] = SMOKE_STATUS_DESC.get(v)
         return d
-
-    # def generate_auth_token(self, expiration=600):
-    #     s = Serializer(c.SECRET_KEY, expires_in=expiration)
-    #     return s.dumps({'social_id': self.social_id})
-    #
-    # @staticmethod
-    # def verify_auth_token(token):
-    #     s = Serializer(c.SECRET_KEY)
-    #     try:
-    #         data = s.loads(token)
-    #     except SignatureExpired:
-    #         return None
-    #     except BadSignature:
-    #         return None
-    #     return get_user_by_social_id(data['social_id'])
 
 
 class WorkExperience(BaseModel):
@@ -259,25 +233,6 @@ class UserInfoProcess(object):
         return map(lambda x: x.photo, UserPhoto.query.filter_by(
             user_id=self.user_id, is_active=True).all())
 
-    # def _process_photo(self, process_name, photo):
-    #     if not photo:
-    #         return
-    #     photos = self.get_photos()
-    #     modify = False
-    #     if process_name == 'add' and photo not in photos:
-    #         photos.append(photo)
-    #         modify = True
-    #     if process_name == 'del' and photo in photos:
-    #         photos.remove(photo)
-    #         modify = True
-    #
-    #     if modify:
-    #         for photo in photos:
-    #             u_p = UserPhoto(user_id=self.user_id)
-    #             u_p.photo = photo
-    #             u_p.save()
-    #     return photos
-
     def add_photo(self, photo):
         u_p = UserPhoto(user_id=self.user_id)
         u_p.photo = photo
@@ -299,51 +254,3 @@ class UserInfoProcess(object):
         info = get_user_info(self.user_id)
         info.auth_info = ''.join(auth_info)
         info.save()
-
-
-class UserInvitationProcess(object):
-
-    def __init__(self, user_id):
-        self.user_id = user_id
-
-    def get_all_invitation(self):
-        _all = UserInvitation.query.filter_by(
-            user_id=self.user_id, is_active=True).order_by(UserInvitation.id.desc()).all()
-        return _all
-
-    def get_all_invitation_dict(self):
-        _all = self.get_all_invitation()
-        data = FancyDict()
-        invitation_type_list = []
-        desc = u''
-        price = 0
-        for _ in _all:
-            invitation_type_list.append(_.invitation_type)
-            desc = _.description
-            price = _.price
-
-        data['price'] = price
-        data['description'] = desc
-        data['invitation_type_list'] = invitation_type_list
-        data['user_id'] = self.user_id
-        return data
-
-    def save_invitation(self, invitation_type_list, price, description=''):
-        invitation_type_list = [safe_int(_) for _ in invitation_type_list if safe_int(_)]
-        for invitation_type in invitation_type_list:
-            invitation = UserInvitation.query.filter_by(user_id=self.user_id, invitation_type=int(invitation_type)).first()
-            if not invitation:
-                invitation = UserInvitation(user_id=self.user_id, invitation_type=safe_int(invitation_type))
-            invitation.description = description
-            invitation.price = safe_int(price)
-            invitation.is_active = True
-            invitation.save()
-            with session_scope() as db_session:
-                db_session.query(UserInvitation).filter(
-                    UserInvitation.user_id == self.user_id,
-                    ~UserInvitation.invitation_type.in_(invitation_type_list)
-                ).update(
-                    dict(is_active=False),
-                    synchronize_session='fetch'
-                )
-

@@ -30,8 +30,8 @@
           action='' enctype="multipart/form-data">
             {{ form.csrf_token }} 
             {{ form_textarea(form.description,row=15) }} 
-            {{ form_checkbox(form.invitation_type)}} 
-            {{ form_field(form.price) }} 
+            {{ form_checkbox(form.theme)}}
+            {{ form_field(form.price) }}
             {{ form_submit() }} 
           </form>
         </div>
