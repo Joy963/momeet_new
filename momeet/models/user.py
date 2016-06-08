@@ -6,6 +6,7 @@ from flask_login import UserMixin
 from momeet.lib import BaseModel, db
 from momeet.models.industry import get_industry
 from momeet.utils import utf8
+from momeet.lib.crypto import id_decrypt
 
 
 USER_PER_PAGE_COUNT = 20
@@ -96,7 +97,7 @@ class User(BaseModel, UserMixin):
 
 
 class WorkExperience(BaseModel):
-    dict_default_columns = ["company_name", "profession", "income", "industry_id"]
+    dict_default_columns = ["id", "company_name", "profession", "income", "industry_id"]
 
     id = db.Column(db.Integer, nullable=False, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -104,6 +105,10 @@ class WorkExperience(BaseModel):
     company_name = db.Column(db.String(100))  # 公司名称
     profession = db.Column(db.String(100))  # 职位
     income = db.Column(db.SmallInteger, default=0)  # 年收入
+
+    @classmethod
+    def get_work_experience(cls, wid):
+        return WorkExperience.query.get(id_decrypt(wid))
 
 
 class EduExperience(BaseModel):
@@ -114,6 +119,10 @@ class EduExperience(BaseModel):
     graduated = db.Column(db.String(100))  # 毕业院校
     education = db.Column(db.SmallInteger, default=0)  # 学历
     major = db.Column(db.String(100))   # 专业
+
+    @classmethod
+    def get_edu_experience(cls, eid):
+        return EduExperience.query.get(id_decrypt(eid))
 
 
 class UserPhoto(BaseModel):
@@ -200,10 +209,30 @@ class UserProcess(object):
             setattr(edu, k, v)
         return edu.save()
 
+    def update_edu_experience(self, d, eid):
+        if not self.user:
+            return False
+        edu = EduExperience.get_edu_experience(eid)
+        if not edu:
+            return False
+        for k, v in d.items():
+            setattr(edu, k, v)
+        return edu.save()
+
     def add_work_experience(self, d):
         if not self.user:
             return False
         work = WorkExperience(user_id=self.user.id)
+        for k, v in d.items():
+            setattr(work, k, v)
+        return work.save()
+
+    def update_work_experience(self, d, wid):
+        if not self.user:
+            return False
+        work = WorkExperience.get_work_experience(wid)
+        if not work:
+            return False
         for k, v in d.items():
             setattr(work, k, v)
         return work.save()

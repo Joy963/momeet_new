@@ -389,26 +389,43 @@ class UserAuthForm(BaseForm):
 
 
 class UserEduInfoForm(BaseForm):
+    user_id = StringField('', [validators.required()])
     graduated = StringField(UserFields.GRADUATED)
     education = IntegerField(UserFields.EDUCATION)
     major = StringField(UserFields.SPECIALTY)
 
-    def save(self, uid):
-        process = UserProcess(uid)
-        keys = [_ for _ in self.data]
-        values = [_.data for _ in filter(lambda x: x.name != 'csrf_token', self)]
-        return process.add_edu_experience(dict(zip(keys, values)))
+    _fields = ['edu_id', 'graduated', 'education', 'major']
+
+    def curd(self, method, eid=None):
+        process = UserProcess(self.user_id.data)
+        d = dict(filter(lambda x: x[0] != 'user_id' and x[1], self.data.items()))
+        if method == 'add':
+            return process.add_edu_experience(d)
+        elif method == 'update':
+            return process.update_edu_experience(d, eid=int(eid))
+        # elif method == 'delete':
+        #     return process.delete_edu_experience(eid=eid)
+        else:
+            return None
 
 
 class UserWorkInfoForm(BaseForm):
+    user_id = StringField('', [validators.required()])
     industry = IntegerField(UserFields.INDUSTRY)
-    company_name = StringField(UserFields.COMPANY_NAME, [validators.required()])
-    profession = StringField(UserFields.PROFESSION, [validators.required()])
-    income = IntegerField(UserFields.INCOME, [validators.required()])
+    company_name = StringField(UserFields.COMPANY_NAME)
+    profession = StringField(UserFields.PROFESSION)
+    income = IntegerField(UserFields.INCOME)
 
-    def save(self, uid):
-        process = UserProcess(uid)
-        keys = [_ for _ in self.data]
-        values = [_.data for _ in filter(lambda x: x.name != 'csrf_token', self)]
-        return process.add_work_experience(dict(zip(keys, values)))
+    def curd(self, method, wid=None):
+        process = UserProcess(self.user_id.data)
+        d = dict(filter(lambda x: x[0] != 'user_id' and x[1], self.data.items()))
+        if method == 'add':
+            return process.add_work_experience(d)
+        elif method == 'update':
+            return process.update_work_experience(d, wid=int(wid))
+        # elif method == 'delete':
+        #     return process.delete_work_experience(wid=wid)
+        else:
+            return None
+
 

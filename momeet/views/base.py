@@ -11,7 +11,7 @@ from flask.views import View
 
 
 class BaseView(View):
-    methods = ['GET', 'POST']
+    methods = ['GET', 'POST', 'PUT', 'DELETE']
 
     def dispatch_request(self, *args, **kwargs):
         request_method = request.method
@@ -22,6 +22,12 @@ class BaseView(View):
         abort(405)
 
     def post(self, *args, **kwargs):
+        abort(405)
+
+    def put(self, *args, **kwargs):
+        abort(405)
+
+    def delete(self, *args, **kwargs):
         abort(405)
 
 

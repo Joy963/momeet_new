@@ -168,7 +168,7 @@ CONSTELLATION_DESC = {
     ConstellationEnum.Capricorn: u'魔羯座',
     ConstellationEnum.Aquarius: u'水瓶座',
     ConstellationEnum.Pisces: u'双鱼座',
-    ConstellationEnum.Aries: u'牡羊座',
+    ConstellationEnum.Aries: u'白羊座',
     ConstellationEnum.Taurus: u'金牛座',
     ConstellationEnum.Gemini: u'双子座',
     ConstellationEnum.Cancer: u'巨蟹座',
