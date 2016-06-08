@@ -3,24 +3,9 @@
 
 from datetime import datetime
 from flask_login import UserMixin
-# import urllib2
-# import cStringIO
-# from itsdangerous import (
-#     TimedJSONWebSignatureSerializer as Serializer,
-#     BadSignature,
-#     SignatureExpired
-# )
-from momeet.lib import (
-    BaseModel, db
-)
+from momeet.lib import BaseModel, db
 from momeet.models.industry import get_industry
-from momeet.models.engagement import Engagement
-# from momeet.constants.user import *
-# from momeet.utils import utf8
-from momeet.lib import session_scope
-from momeet.utils import utf8, FancyDict, safe_int
-# from momeet.utils.upload import save_avatar_to_qiniu
-# from momeet.config import c
+from momeet.utils import utf8
 
 
 USER_PER_PAGE_COUNT = 20

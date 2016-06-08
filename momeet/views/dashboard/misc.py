@@ -7,13 +7,12 @@ from flask import (
     jsonify, request
 )
 
-from momeet.models.industry import get_all_industry, get_industry
-from momeet.utils.view import flash
 from momeet.constants.city import CITY_DATA
-from momeet.utils.upload import save_upload_file_to_qiniu
-
-from ._base import BaseView
 from momeet.forms.industry import IndustryForm
+from momeet.models.industry import get_all_industry, get_industry
+from momeet.utils.upload import save_upload_file_to_qiniu
+from momeet.utils.view import flash
+from momeet.views.base import BaseView
 
 
 bp = Blueprint('dashboard', __name__)

@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from ._base import BaseView
+from momeet.views.base import BaseView
 from momeet.models.engagement import Engagement
 from momeet.forms.engagement import EngagementForm
 # from momeet.models.user import get_user

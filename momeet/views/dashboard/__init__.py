@@ -17,6 +17,7 @@ def regist_routes(app, url_prefix='/dashboard/'):
     app.register_blueprint(dashboard_bp, url_prefix=url_prefix)
     app.register_blueprint(user_bp, url_prefix=url_prefix + 'user/')
     app.register_blueprint(account_bp, url_prefix=url_prefix + 'account/')
+    return app
 
 
 def before_request(app):

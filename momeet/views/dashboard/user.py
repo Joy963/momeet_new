@@ -7,30 +7,25 @@ from flask import (
     redirect, jsonify
 )
 
-from momeet.models.user import (
-    get_user_list_by_page, USER_PER_PAGE_COUNT,
-    get_user, UserInfoProcess, get_user_info,
-    # UserInvitationProcess
-)
-
-from momeet.models.engagement import UserEngagementProcess
-
-from momeet.utils import safe_int, Pagination, flash
 from momeet.constants.user import (
     USER_GENDER_DESC,
 )
-
-from momeet.utils import logger
-
-from ._base import BaseView, FlagView
+from momeet.forms.engagement import EngagementForm
 from momeet.forms.user import (
     UserForm, UserPhotoForm,
     UserDetailForm,
     # UserInvitationForm,
     UserAuthForm
 )
-
-from momeet.forms.engagement import EngagementForm
+from momeet.models.engagement import UserEngagementProcess
+from momeet.models.user import (
+    get_user_list_by_page, USER_PER_PAGE_COUNT,
+    get_user, UserInfoProcess, get_user_info,
+    # UserInvitationProcess
+)
+from momeet.utils import logger
+from momeet.utils import safe_int, Pagination, flash
+from momeet.views.base import BaseView, FlagView
 
 bp = Blueprint('dashboard.user', __name__)
 

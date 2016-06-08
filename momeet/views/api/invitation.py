@@ -1,5 +1,5 @@
-from flask import Blueprint, request, jsonify
-from ._base import BaseView
+from flask import Blueprint, jsonify
+from momeet.views.base import BaseView
 from momeet.forms.invitation import InvitationCodeForm
 from momeet.models.invitation import create_invitation_code
 
