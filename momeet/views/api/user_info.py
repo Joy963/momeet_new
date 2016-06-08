@@ -51,8 +51,11 @@ class UserEduInfo(BaseView):
 
     def post(self):
         form = UserEduInfoForm(csrf_enabled=False)
-        if form.validate_on_submit() and form.curd('add'):
-            return jsonify({"success": True, "msg": "add edu exprience success"})
+        if form.validate_on_submit():
+            edu = form.curd('add')
+            return jsonify({"success": True,
+                            'edu_id': edu.id if edu else None,
+                            "msg": "add edu exprience success"})
         return jsonify({"success": False, "msg": "add edu exprience failed"})
 
     def put(self, eid=None):
@@ -83,8 +86,11 @@ class UserWorkInfo(BaseView):
 
     def post(self):
         form = UserWorkInfoForm(csrf_enabled=False)
-        if form.validate_on_submit() and form.curd('add'):
-            return jsonify({"success": True, "msg": "add work exprience success"})
+        if form.validate_on_submit():
+            work = form.curd('add')
+            return jsonify({"success": True,
+                            "work_id": work.id if work else None,
+                            "msg": "add work exprience success"})
         return jsonify({"success": False, "msg": "add work exprience failed"})
 
     def put(self, wid=None):

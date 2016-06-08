@@ -196,14 +196,14 @@ class UserProcess(object):
 
     def update_avatar(self, avatar_uri):
         if not self.user:
-            return False
+            return None
         self.user.avatar = avatar_uri
         self.user.save()
         return avatar_uri
 
     def add_edu_experience(self, d):
         if not self.user:
-            return False
+            return None
         edu = EduExperience(user_id=self.user.id)
         for k, v in d.items():
             setattr(edu, k, v)
@@ -211,17 +211,17 @@ class UserProcess(object):
 
     def update_edu_experience(self, d, eid):
         if not self.user:
-            return False
+            return None
         edu = EduExperience.get_edu_experience(eid)
         if not edu:
-            return False
+            return None
         for k, v in d.items():
             setattr(edu, k, v)
         return edu.save()
 
     def add_work_experience(self, d):
         if not self.user:
-            return False
+            return None
         work = WorkExperience(user_id=self.user.id)
         for k, v in d.items():
             setattr(work, k, v)
@@ -229,10 +229,10 @@ class UserProcess(object):
 
     def update_work_experience(self, d, wid):
         if not self.user:
-            return False
+            return None
         work = WorkExperience.get_work_experience(wid)
         if not work:
-            return False
+            return None
         for k, v in d.items():
             setattr(work, k, v)
         return work.save()
