@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from momeet.views.base import BaseView
+from momeet.lib.crypto import id_decrypt, id_encrypt
 from momeet.models.user import (
     get_user,
     EduExperience,
@@ -54,7 +55,7 @@ class UserEduInfo(BaseView):
         if form.validate_on_submit():
             edu = form.curd('add')
             return jsonify({"success": True,
-                            'edu_id': edu.id if edu else None,
+                            'edu_id': id_encrypt(edu.id) if edu else None,
                             "msg": "add edu exprience success"})
         return jsonify({"success": False, "msg": "add edu exprience failed"})
 
@@ -89,7 +90,7 @@ class UserWorkInfo(BaseView):
         if form.validate_on_submit():
             work = form.curd('add')
             return jsonify({"success": True,
-                            "work_id": work.id if work else None,
+                            "work_id": id_encrypt(work.id) if work else None,
                             "msg": "add work exprience success"})
         return jsonify({"success": False, "msg": "add work exprience failed"})
 
