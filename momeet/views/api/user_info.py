@@ -55,13 +55,15 @@ class UserEduInfo(BaseView):
             return jsonify({"success": True, "msg": "add edu exprience success"})
         return jsonify({"success": False, "msg": "add edu exprience failed"})
 
-    def put(self, eid):
+    def put(self, eid=None):
         form = UserEduInfoForm(csrf_enabled=False)
-        if form.validate_on_submit() and form.curd('update', eid):
+        if eid and form.validate_on_submit() and form.curd('update', eid):
             return jsonify({"success": True, "msg": "update edu exprience success"})
         return jsonify({"success": False, "msg": "update edu exprience failed"})
 
-    def delete(self, eid):
+    def delete(self, eid=None):
+        if not eid:
+            return jsonify({"success": False, "msg": "delete edu exprience failed"})
         edu = EduExperience.get_edu_experience(int(eid))
         edu.delete() if edu else None
         return jsonify({"success": True, "msg": "delete edu exprience success"})
@@ -79,19 +81,21 @@ class UserWorkInfo(BaseView):
             work = WorkExperience.get_work_experience(int(wid))
             return jsonify({"success": True, "edu_experience": work.to_dict() if work else {}})
 
-    def post(self, wid):
+    def post(self):
         form = UserWorkInfoForm(csrf_enabled=False)
         if form.validate_on_submit() and form.curd('add'):
             return jsonify({"success": True, "msg": "add work exprience success"})
         return jsonify({"success": False, "msg": "add work exprience failed"})
 
-    def put(self, wid):
+    def put(self, wid=None):
         form = UserWorkInfoForm(csrf_enabled=False)
-        if form.validate_on_submit() and form.curd('update', wid):
+        if wid and form.validate_on_submit() and form.curd('update', wid):
             return jsonify({"success": True, "msg": "update work exprience success"})
         return jsonify({"success": False, "msg": "update work exprience failed"})
 
-    def delete(self, wid):
+    def delete(self, wid=None):
+        if not wid:
+            return jsonify({"success": False, "msg": "delete work exprience failed"})
         work = WorkExperience.get_work_experience(int(wid))
         work.delete() if work else None
         return jsonify({"success": True, "msg": "delete work exprience success"})
