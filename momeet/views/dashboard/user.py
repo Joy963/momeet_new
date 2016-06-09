@@ -67,8 +67,10 @@ class CreateUserView(BaseView):
 class UserView(FlagView):
     template_name = "dashboard/user/user.html"
     REDIRECT = True
-    MODIFY_IS_ACTIVE = True
+    MODIFY_IS_ACTIVE = False
     SAVE_RES = False
+    _form = None
+    redirect_url = None
 
     def get_res(self, res_id):
         return get_user(res_id)

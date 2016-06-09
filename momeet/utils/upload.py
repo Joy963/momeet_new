@@ -3,7 +3,7 @@
 
 from .qnutil import QiniuHelper
 
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+ALLOWED_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif']
 
 
 def allowed_file(filename):
@@ -11,9 +11,9 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-def save_upload_file_to_qiniu(file):
+def save_upload_file_to_qiniu(f):
     helper = QiniuHelper()
-    src = helper.upload_img(file)
+    src = helper.upload_img(f)
     return src
 
 
