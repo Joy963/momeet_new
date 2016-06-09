@@ -70,22 +70,18 @@ class EducationStatus(IntEnum):
     STATUS5 = 5
     STATUS6 = 6
     STATUS7 = 7
-    STATUS8 = 8
-    STATUS9 = 9
 
     def describe(self):
         return EDUCATION_STATUS_DESC.get(self.value, '')
 
 EDUCATION_STATUS_DESC = {
-    EducationStatus.STATUS1: u'高中',
-    EducationStatus.STATUS2: u'技校',
-    EducationStatus.STATUS3: u'中专',
-    EducationStatus.STATUS4: u'大专',
-    EducationStatus.STATUS5: u'大学本科',
-    EducationStatus.STATUS6: u'硕士研究生',
-    EducationStatus.STATUS7: u'博士研究生',
-    EducationStatus.STATUS8: u'博士以上',
-    EducationStatus.STATUS9: u'其他',
+    EducationStatus.STATUS1: u'专科',
+    EducationStatus.STATUS2: u'本科',
+    EducationStatus.STATUS3: u'硕士',
+    EducationStatus.STATUS4: u'博士',
+    EducationStatus.STATUS5: u'博士后',
+    EducationStatus.STATUS6: u'MBA',
+    EducationStatus.STATUS7: u'其他',
 }
 
 

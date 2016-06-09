@@ -43,14 +43,6 @@ class UserForm(BaseForm):
         ],
     )
 
-    # def validate_user_name(self, field):
-    #     name = field.data.strip().lower()
-    #     u = get_user_by_name(name)
-    #     if not self._obj and u:
-    #         raise ValueError(ErrorsEnum.USER_NAME_EXISTS.describe())
-    #     if self._obj and self._obj.user_name != name and u:
-    #         raise ValueError(ErrorsEnum.USER_NAME_EXISTS.describe())
-
     real_name = StringField(UserFields.REAL_NAME)
 
     id_card = StringField(UserFields.ID_CARD)
@@ -188,14 +180,9 @@ class UserForm(BaseForm):
         self.init_choices()
 
     def save(self):
-        if self._obj:
-            user = self._obj
-            # work = self._obj.work.order_by(WorkExperience.id.desc()).first()
-            # edu = self._obj.edu.order_by(EduExperience.id.desc()).first()
-        else:
-            user = User()
-            # work = WorkExperience()
-            # edu = EduExperience()
+        user = self._obj or User()
+        work = user.work.order_by(WorkExperience.id.desc()).first() or WorkExperience()
+        edu = user.edu.order_by(EduExperience.id.desc()).first() or EduExperience()
         for k, v in self.data.items():
             if k == 'avatar':
                 if v:
@@ -205,15 +192,38 @@ class UserForm(BaseForm):
             if k == 'height':
                 setattr(user, k, safe_int(v))
                 continue
-            if k == 'industry':
-                if v:
-                    setattr(user, 'industry_id', v.id)
-                continue
             if k == 'user_name':
                 setattr(user, 'user_name', v.strip().lower())
                 continue
+            if k == 'industry':
+                if v:
+                    setattr(work, 'industry_id', v.id)
+                continue
+            if k == 'income':
+                setattr(work, 'income',  safe_int(v))
+                continue
+            if k == 'company_name':
+                print k, v
+                setattr(work, 'company_name', v)
+                continue
+            if k == 'profession':
+                setattr(work, 'profession', v)
+                continue
+            if k == 'graduated':
+                setattr(edu, 'graduated', v)
+                continue
+            if k == 'education':
+                setattr(edu, 'education', safe_int(v))
+                continue
+            if k == 'major':
+                setattr(edu, 'major', v)
+                continue
             setattr(user, k, v)
         user.save()
+        work.user_id = user.id
+        work.save()
+        edu.user_id = user.id
+        edu.save()
         return user
 
 

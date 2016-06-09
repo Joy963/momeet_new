@@ -81,7 +81,7 @@ class User(BaseModel, UserMixin):
                             'birthday', 'age', 'height', 'location', 'affection',
                             'mobile_num', 'weixin_num', 'country', 'drink', 'smoke',
                             'hometown', 'constellation', 'religion', 'created',
-                            'income', 'social_id', 'wechat_union_id', 'id']
+                            'social_id', 'wechat_union_id', 'id']
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -94,15 +94,16 @@ class User(BaseModel, UserMixin):
 
     def to_dict_ext(self, columns=None):
         d = self.to_dict(columns=columns)
-        industry = get_industry(self.industry_id)
+        work = self.work.order_by(WorkExperience.id.desc()).first()
+        industry = get_industry(work.industry_id if work else 0)
         d['industry'] = industry.name if industry else ''
-        d['work_expirence'] = map(lambda x: x.to_dict(), WorkExperience.query.filter_by(user_id=self.id).all())
-        d['edu_expirence'] = map(lambda x: x.to_dict(), EduExperience.query.filter_by(user_id=self.id).all())
+        d['work_expirence'] = map(lambda x: x.to_dict(), self.work.all())
+        d['edu_expirence'] = map(lambda x: x.to_dict(), self.edu.all())
         return d
 
 
 class WorkExperience(BaseModel):
-    dict_default_columns = ["id", "company_name", "profession", "income", "industry_id", "created"]
+    dict_default_columns = ["id", "company_name", "profession", "income", "industry_id", "created", "user_id"]
 
     id = db.Column(db.Integer, nullable=False, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -118,7 +119,7 @@ class WorkExperience(BaseModel):
 
 
 class EduExperience(BaseModel):
-    dict_default_columns = ["id", "graduated", "education", "major", "created"]
+    dict_default_columns = ["id", "graduated", "education", "major", "created", "user_id"]
 
     id = db.Column(db.Integer, nullable=False, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
