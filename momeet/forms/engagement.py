@@ -14,9 +14,7 @@ from momeet.constants.user import InvitationTypeEnum
 class EngagementForm(BaseForm):
     description = TextAreaField(UserFields.INVITATION_DESC, [validators.required()])
     price = IntegerField(UserFields.INVITATION_PRICE, default=50)
-    theme = MultiCheckboxField(
-        UserFields.INVITATION_TYPE
-    )
+    theme = MultiCheckboxField(UserFields.INVITATION_TYPE)
 
     def __init__(self, *args, **kwargs):
         super(EngagementForm, self).__init__(*args, **kwargs)

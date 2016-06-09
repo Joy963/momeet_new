@@ -54,14 +54,6 @@ class User(BaseModel, UserMixin):
     country = db.Column(db.String(20))  # 国家
     location = db.Column(db.String(100), default='0,0')  # 所在城市
 
-    # industry_id = db.Column(db.Integer, default=0)  # 行业
-    # company_name = db.Column(db.String(100))  # 公司名称
-    # profession = db.Column(db.String(100))  # 职位
-    # income = db.Column(db.SmallInteger, default=0)  # 年收入
-
-    # graduated = db.Column(db.String(100))  # 毕业院校
-    # education = db.Column(db.SmallInteger, default=0)  # 学历
-
     engagement = db.relationship('Engagement', backref='user_engagement', lazy='dynamic')
     edu = db.relationship('EduExperience', backref='user_edu_experience', lazy='dynamic')
     work = db.relationship('WorkExperience', backref='user_work_experience', lazy='dynamic')
@@ -94,9 +86,7 @@ class User(BaseModel, UserMixin):
 
     def to_dict_ext(self, columns=None):
         d = self.to_dict(columns=columns)
-        work = self.work.order_by(WorkExperience.id.desc()).first()
-        industry = get_industry(work.industry_id if work else 0)
-        d['industry'] = industry.name if industry else ''
+        d['birthday'] = d.get('birthday')[:10]
         d['work_expirence'] = map(lambda x: x.to_dict(), self.work.all())
         d['edu_expirence'] = map(lambda x: x.to_dict(), self.edu.all())
         return d
@@ -157,16 +147,16 @@ class UserInfo(BaseModel):
         return info
 
 
-class UserInvitation(BaseModel):
-    """
-    用户支持的邀约
-    """
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, nullable=False, index=True)
-    invitation_type = db.Column(db.SmallInteger, nullable=False)
-    description = db.Column(db.String(1000))  # 活动介绍
-    price = db.Column(db.Integer, default=0)  # 活动价格
-    is_active = db.Column(db.Boolean, default=True)
+# class UserInvitation(BaseModel):
+#     """
+#     用户支持的邀约
+#     """
+#     id = db.Column(db.Integer, primary_key=True)
+#     user_id = db.Column(db.Integer, nullable=False, index=True)
+#     invitation_type = db.Column(db.SmallInteger, nullable=False)
+#     description = db.Column(db.String(1000))  # 活动介绍
+#     price = db.Column(db.Integer, default=0)  # 活动价格
+#     is_active = db.Column(db.Boolean, default=True)
 
 
 def get_user(user_id):
