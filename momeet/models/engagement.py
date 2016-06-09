@@ -5,6 +5,7 @@
 from datetime import datetime
 from momeet.lib import BaseModel, db
 from momeet.utils import FancyDict, safe_int
+from sqlalchemy.event import listens_for
 
 
 class Theme(BaseModel):
@@ -36,10 +37,8 @@ class Engagement(BaseModel):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
     description = db.Column(db.String(5000))
     theme = db.relationship('Theme', backref='engagement_theme', lazy='dynamic')
-
     is_active = db.Column(db.Boolean, default=True)
     created = db.Column(db.DateTime, default=datetime.now())
 

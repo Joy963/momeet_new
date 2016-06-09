@@ -5,9 +5,8 @@ from enum import IntEnum
 
 
 class UserGender(IntEnum):
-    UNKNOWN = 0
-    WOMAN = 1
-    MAN = 2
+    MAN = 1
+    WOMAN = 2
 
     def describe(self):
         return USER_GENDER_DESC.get(self.value, u'')
@@ -16,7 +15,6 @@ class UserGender(IntEnum):
 USER_GENDER_DESC = {
     UserGender.WOMAN: u'女',
     UserGender.MAN: u'男',
-    UserGender.UNKNOWN: u'未知',
 }
 
 
@@ -29,7 +27,7 @@ class UserAffection(IntEnum):
     LOST_SPOUSE = 6
 
     def describe(self):
-        return USER_AFFECTION_DESC.get(self.value, '')
+        return USER_AFFECTION_DESC.get(self.value, u'')
 
 USER_AFFECTION_DESC = {
     UserAffection.SINGLE: u'单身并享受单身的状态',
@@ -50,7 +48,7 @@ class IncomeStatus(IntEnum):
     STATUS6 = 6
 
     def describe(self):
-        return INCOME_STATUS_DESC.get(self.value, '')
+        return INCOME_STATUS_DESC.get(self.value, u'')
 
 INCOME_STATUS_DESC = {
     IncomeStatus.STATUS1: u'10W以下',
@@ -72,7 +70,7 @@ class EducationStatus(IntEnum):
     STATUS7 = 7
 
     def describe(self):
-        return EDUCATION_STATUS_DESC.get(self.value, '')
+        return EDUCATION_STATUS_DESC.get(self.value, u'')
 
 EDUCATION_STATUS_DESC = {
     EducationStatus.STATUS1: u'专科',
@@ -92,7 +90,7 @@ class DrinkStatus(IntEnum):
     STATUS4 = 4
 
     def describe(self):
-        return DRINK_STATUS_DESC.get(self.value, '')
+        return DRINK_STATUS_DESC.get(self.value, u'')
 
 
 DRINK_STATUS_DESC = {
@@ -110,7 +108,7 @@ class SmokeStatus(IntEnum):
     STATUS4 = 4
 
     def describe(self):
-        return SMOKE_STATUS_DESC.get(self.value, '')
+        return SMOKE_STATUS_DESC.get(self.value, u'')
 
 SMOKE_STATUS_DESC = {
     SmokeStatus.STATUS1: u'从不，比较反感',
@@ -130,7 +128,7 @@ class ReligionEnum(IntEnum):
     OTHER = 7
 
     def describe(self):
-        return RELIGION_DESC.get(self.value, '')
+        return RELIGION_DESC.get(self.value, u'')
 
 RELIGION_DESC = {
     ReligionEnum.NONE: u'无宗教信仰',
@@ -158,7 +156,7 @@ class ConstellationEnum(IntEnum):
     Sagittarius = 12
 
     def describe(self):
-        return CONSTELLATION_DESC.get(self.value, '')
+        return CONSTELLATION_DESC.get(self.value, u'')
 
 CONSTELLATION_DESC = {
     ConstellationEnum.Capricorn: u'魔羯座',
@@ -182,7 +180,7 @@ class AuthTypeEnum(IntEnum):
     TYPE3 = 3
 
     def describe(self):
-        return AUTH_TYPE_DESC.get(self.value, '')
+        return AUTH_TYPE_DESC.get(self.value, u'')
 
 AUTH_TYPE_DESC = {
     AuthTypeEnum.TYPE1: u'职业身份认证',
@@ -203,7 +201,7 @@ class InvitationTypeEnum(IntEnum):
     TYPE9 = 9
 
     def describe(self):
-        return INVITATION_TYPE_DESC.get(self.value, '')
+        return INVITATION_TYPE_DESC.get(self.value, u'')
 
 INVITATION_TYPE_DESC = {
     InvitationTypeEnum.TYPE1: u'吃饭、聚餐',
@@ -215,4 +213,55 @@ INVITATION_TYPE_DESC = {
     InvitationTypeEnum.TYPE7: u'看电影',
     InvitationTypeEnum.TYPE8: u'演唱会、话剧、展览等演出',
     InvitationTypeEnum.TYPE9: u'其他',
+}
+
+
+class IndustryTypeEnum(IntEnum):
+    TYPE1 = 1
+    TYPE2 = 2
+    TYPE3 = 3
+    TYPE4 = 4
+    TYPE5 = 5
+    TYPE6 = 6
+    TYPE7 = 7
+    TYPE8 = 8
+    TYPE9 = 9
+    TYPE10 = 10
+    TYPE11 = 11
+    TYPE12 = 12
+    TYPE13 = 13
+    TYPE14 = 14
+    TYPE15 = 15
+    TYPE16 = 16
+    TYPE17 = 17
+    TYPE18 = 18
+    TYPE19 = 19
+    TYPE20 = 20
+    TYPE21 = 21
+
+    def describe(self):
+        return INDUSTRY_TYPE_DESC.get(self.value, u'')
+
+INDUSTRY_TYPE_DESC = {
+    IndustryTypeEnum.TYPE1: u'互联网/软件',
+    IndustryTypeEnum.TYPE2: u'金融',
+    IndustryTypeEnum.TYPE3: u'重工制造',
+    IndustryTypeEnum.TYPE4: u'法律/会计/咨询',
+    IndustryTypeEnum.TYPE5: u'贸易',
+    IndustryTypeEnum.TYPE6: u'房产建筑',
+    IndustryTypeEnum.TYPE7: u'学生',
+    IndustryTypeEnum.TYPE8: u'文化/传媒',
+    IndustryTypeEnum.TYPE9: u'电子/硬件',
+    IndustryTypeEnum.TYPE10: u'轻工制造',
+    IndustryTypeEnum.TYPE11: u'教育科研',
+    IndustryTypeEnum.TYPE12: u'零售',
+    IndustryTypeEnum.TYPE13: u'能源环保水利',
+    IndustryTypeEnum.TYPE14: u'酒店旅游',
+    IndustryTypeEnum.TYPE15: u'制药/生物科技',
+    IndustryTypeEnum.TYPE16: u'医疗',
+    IndustryTypeEnum.TYPE17: u'生活服务',
+    IndustryTypeEnum.TYPE18: u'交通运输',
+    IndustryTypeEnum.TYPE19: u'电信',
+    IndustryTypeEnum.TYPE20: u'政府/社会组织',
+    IndustryTypeEnum.TYPE21: u'农林牧渔',
 }

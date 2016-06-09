@@ -13,7 +13,6 @@ from momeet.utils.view import (
 )
 from momeet.constants.user import *
 from momeet.constants.city import CITY_DATA
-from momeet.models.industry import get_all_industry, get_industry
 from momeet.models.user import *
 from momeet.models.engagement import Engagement
 from momeet.utils import safe_int, ClearElement, logger, utf8
@@ -103,19 +102,13 @@ class UserForm(BaseForm):
         if not self._validate_province_city(data):
             raise ValueError(ErrorsEnum.LOCATION_ERROR.describe())
 
-    industry = QuerySelectField(
-        UserFields.INDUSTRY,
-        query_factory=get_all_industry,
-        allow_blank=True,
-        blank_text=u'-- 请选择 --'
-    )
-
     company_name = StringField(UserFields.COMPANY_NAME)
 
     profession = StringField(UserFields.PROFESSION)
 
     affection = SelectField(UserFields.AFFECTION)
 
+    industry = SelectField(UserFields.INDUSTRY)
     income = SelectField(UserFields.INCOME)
 
     graduated = StringField(UserFields.GRADUATED)
@@ -144,7 +137,6 @@ class UserForm(BaseForm):
         work = self._obj.work.order_by(WorkExperience.id.desc()).first() if self._obj else None
         edu = self._obj.edu.order_by(EduExperience.id.desc()).first() if self._obj else None
 
-        self.industry.selected = get_industry(work.industry_id if work else 0)
         self.company_name.data = work.company_name if work else ""
         self.profession.data = work.profession if work else ""
         self.graduated.data = edu.graduated if edu else ""
@@ -152,6 +144,7 @@ class UserForm(BaseForm):
         field_dict = {
             'affection': UserAffection,
             'education': EducationStatus,
+            'industry': IndustryTypeEnum,
             'income': IncomeStatus,
             'drink': DrinkStatus,
             'smoke': SmokeStatus,
@@ -166,9 +159,7 @@ class UserForm(BaseForm):
             _choices.insert(0, ('0', u'请选择'))
             field.choices = _choices
             if self._obj:
-                if f == 'income':
-                    field.default = str(getattr(work, f)) if work else '0'
-                elif f == 'education':
+                if f == 'education':
                     field.default = str(getattr(edu, f)) if edu else '0'
                 else:
                     field.default = str(getattr(self._obj, f)) or "0"
@@ -195,15 +186,7 @@ class UserForm(BaseForm):
             if k == 'user_name':
                 setattr(user, 'user_name', v.strip().lower())
                 continue
-            if k == 'industry':
-                if v:
-                    setattr(work, 'industry_id', v.id)
-                continue
-            if k == 'income':
-                setattr(work, 'income',  safe_int(v))
-                continue
             if k == 'company_name':
-                print k, v
                 setattr(work, 'company_name', v)
                 continue
             if k == 'profession':
@@ -377,7 +360,6 @@ class UserEduInfoForm(BaseForm):
 
 class UserWorkInfoForm(BaseForm):
     user_id = StringField('', [validators.required()])
-    industry = IntegerField(UserFields.INDUSTRY)
     company_name = StringField(UserFields.COMPANY_NAME)
     profession = StringField(UserFields.PROFESSION)
     income = IntegerField(UserFields.INCOME)

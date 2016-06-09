@@ -4,7 +4,6 @@
 from datetime import datetime
 from flask_login import UserMixin
 from momeet.lib import BaseModel, db
-from momeet.models.industry import get_industry
 from momeet.utils import utf8
 from momeet.lib.crypto import id_decrypt
 
@@ -59,6 +58,9 @@ class User(BaseModel, UserMixin):
     work = db.relationship('WorkExperience', backref='user_work_experience', lazy='dynamic')
     photo = db.relationship('UserPhoto', backref='user_photo', lazy='dynamic')
 
+    industry = db.Column(db.SmallInteger, default=0)  # 行业
+    income = db.Column(db.SmallInteger, default=0)  # 年收入
+
     affection = db.Column(db.SmallInteger, default=0)  # 感情状况
     hometown = db.Column(db.String(100), default='0,0')  # 家乡
 
@@ -73,7 +75,7 @@ class User(BaseModel, UserMixin):
                             'birthday', 'age', 'height', 'location', 'affection',
                             'mobile_num', 'weixin_num', 'country', 'drink', 'smoke',
                             'hometown', 'constellation', 'religion', 'created',
-                            'social_id', 'wechat_union_id', 'id']
+                            'social_id', 'wechat_union_id', 'id', 'industry', 'income']
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -93,14 +95,12 @@ class User(BaseModel, UserMixin):
 
 
 class WorkExperience(BaseModel):
-    dict_default_columns = ["id", "company_name", "profession", "income", "industry_id", "created", "user_id"]
+    dict_default_columns = ["id", "company_name", "profession", "created", "user_id"]
 
     id = db.Column(db.Integer, nullable=False, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    industry_id = db.Column(db.Integer, default=0)  # 行业
     company_name = db.Column(db.String(100))  # 公司名称
     profession = db.Column(db.String(100))  # 职位
-    income = db.Column(db.SmallInteger, default=0)  # 年收入
     created = db.Column(db.DateTime, default=datetime.now())
 
     @classmethod
