@@ -94,7 +94,7 @@ class BaseModel(DefaultModel, SessionMixin):
             else:
                 value = getattr(self, col)
             if isinstance(value, datetime.datetime):
-                value = value.strftime('%Y-%m-%d')
+                value = value.strftime('%Y-%m-%d %H:%M:%S')
             if isinstance(value, BaseModel):
                 value = value.to_dict()
             if value is None:

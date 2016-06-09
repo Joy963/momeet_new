@@ -80,6 +80,7 @@ class UserView(FlagView):
         if not user:
             abort(404)
         form = UserForm(obj=user)
+        # form.process()
         return render_template(self.template_name, user=user, form=form)
 
     def check_update(self, user):

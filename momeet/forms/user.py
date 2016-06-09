@@ -1,12 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from wtforms import (
-    StringField, FileField,
-    DateTimeField, SelectField,
-    TextAreaField, IntegerField,
-    validators, DateField
-)
+from wtforms import *
 from wtforms.validators import DataRequired, Optional
 
 from momeet.forms.base import BaseForm
@@ -19,11 +14,7 @@ from momeet.utils.view import (
 from momeet.constants.user import *
 from momeet.constants.city import CITY_DATA
 from momeet.models.industry import get_all_industry, get_industry
-from momeet.models.user import (
-    get_user, User,
-    UserProcess,
-    UserInfoProcess,
-)
+from momeet.models.user import *
 from momeet.models.engagement import Engagement
 from momeet.utils import safe_int, ClearElement, logger, utf8
 from momeet.utils.upload import save_upload_file_to_qiniu, allowed_file
@@ -33,9 +24,7 @@ from .fields_name import UserFields
 
 class UserForm(BaseForm):
 
-    avatar = FileField(
-        UserFields.AVATAR
-    )
+    avatar = FileField(UserFields.AVATAR)
 
     def validate_avatar(self, field):
         data = field.data
@@ -62,17 +51,11 @@ class UserForm(BaseForm):
     #     if self._obj and self._obj.user_name != name and u:
     #         raise ValueError(ErrorsEnum.USER_NAME_EXISTS.describe())
 
-    real_name = StringField(
-        UserFields.REAL_NAME,
-    )
+    real_name = StringField(UserFields.REAL_NAME)
 
-    id_card = StringField(
-        UserFields.ID_CARD,
-    )
+    id_card = StringField(UserFields.ID_CARD)
 
-    gender = RadioField(
-        UserFields.GENDER,
-    )
+    gender = RadioField(UserFields.GENDER)
 
     birthday = DateTimeField(
         UserFields.BIRTHDAY,
@@ -82,9 +65,7 @@ class UserForm(BaseForm):
         ]
     )
 
-    height = StringField(
-        UserFields.HEIGHT,
-    )
+    height = StringField(UserFields.HEIGHT)
 
     def validate_height(self, field):
         data = field.data
@@ -95,17 +76,11 @@ class UserForm(BaseForm):
         except:
             raise ValueError(ErrorsEnum.HEIGHT_ERROR.describe())
 
-    mobile_num = StringField(
-        UserFields.MOBILE_NUM,
-    )
+    mobile_num = StringField(UserFields.MOBILE_NUM)
 
-    weixin_num = StringField(
-        UserFields.WEIXIN_NUM,
-    )
+    weixin_num = StringField(UserFields.WEIXIN_NUM)
 
-    location = StringField(
-        UserFields.LOCATION,
-    )
+    location = StringField(UserFields.LOCATION)
 
     def _validate_province_city(self, data):
         province = -1
@@ -143,67 +118,44 @@ class UserForm(BaseForm):
         blank_text=u'-- 请选择 --'
     )
 
-    company_name = StringField(
-        UserFields.COMPANY_NAME,
-    )
+    company_name = StringField(UserFields.COMPANY_NAME)
 
-    profession = StringField(
-        UserFields.PROFESSION,
-    )
+    profession = StringField(UserFields.PROFESSION)
 
-    affection = SelectField(
-        UserFields.AFFECTION,
-    )
+    affection = SelectField(UserFields.AFFECTION)
 
-    income = SelectField(
-        UserFields.INCOME,
-    )
+    income = SelectField(UserFields.INCOME)
 
-    graduated = StringField(
-        UserFields.GRADUATED,
-    )
+    graduated = StringField(UserFields.GRADUATED)
 
-    education = SelectField(
-        UserFields.EDUCATION,
-    )
+    education = SelectField(UserFields.EDUCATION)
 
-    hometown = StringField(
-        UserFields.HOMETOWN,
-    )
+    hometown = StringField(UserFields.HOMETOWN)
 
     def validate_hometown(self, field):
         data = field.data
         if not self._validate_province_city(data):
             raise ValueError(ErrorsEnum.HOMETOWN_ERROR.describe())
 
-    drink = SelectField(
-        UserFields.DRINK,
-    )
+    drink = SelectField(UserFields.DRINK)
 
-    smoke = SelectField(
-        UserFields.SMOKE,
-    )
+    smoke = SelectField(UserFields.SMOKE)
 
-    constellation = SelectField(
-        UserFields.CONSTELLATION,
-    )
+    constellation = SelectField(UserFields.CONSTELLATION)
 
-    religion = SelectField(
-        UserFields.RELIGION,
-    )
+    religion = SelectField(UserFields.RELIGION)
 
     def init_choices(self):
-        self.gender.choices = [
-            (str(_.value), _.describe())
-            for _ in [UserGender.MAN, UserGender.WOMAN]
-        ]
-        if self._obj:
-            self.gender.default = str(self._obj.gender)
-        else:
-            self.gender.default = str(UserGender.MAN.value)
+        self.gender.choices = [(str(_.value), _.describe()) for _ in [UserGender.MAN, UserGender.WOMAN]]
+        self.gender.default = str(self._obj.gender) if self._obj else str(UserGender.MAN.value)
 
-        if self._obj:
-            self.industry.selected = get_industry(self._obj.industry_id)
+        work = self._obj.work.order_by(WorkExperience.id.desc()).first() if self._obj else None
+        edu = self._obj.edu.order_by(EduExperience.id.desc()).first() if self._obj else None
+
+        self.industry.selected = get_industry(work.industry_id if work else 0)
+        self.company_name.data = work.company_name if work else ""
+        self.profession.data = work.profession if work else ""
+        self.graduated.data = edu.graduated if edu else ""
 
         field_dict = {
             'affection': UserAffection,
@@ -218,14 +170,16 @@ class UserForm(BaseForm):
         for f in field_dict:
             field = getattr(self, f)
             _enum = field_dict.get(f)
-            _choices = [
-                (str(_.value), _.describe())
-                for _ in sorted(_enum.__members__.values())
-            ]
+            _choices = [(str(_.value), _.describe()) for _ in sorted(_enum.__members__.values())]
             _choices.insert(0, ('0', u'请选择'))
             field.choices = _choices
             if self._obj:
-                field.default = str(getattr(self._obj, f))
+                if f == 'income':
+                    field.default = str(getattr(work, f)) if work else '0'
+                elif f == 'education':
+                    field.default = str(getattr(edu, f)) if edu else '0'
+                else:
+                    field.default = str(getattr(self._obj, f)) or "0"
             else:
                 field.default = '0'
 
@@ -236,8 +190,12 @@ class UserForm(BaseForm):
     def save(self):
         if self._obj:
             user = self._obj
+            # work = self._obj.work.order_by(WorkExperience.id.desc()).first()
+            # edu = self._obj.edu.order_by(EduExperience.id.desc()).first()
         else:
             user = User()
+            # work = WorkExperience()
+            # edu = EduExperience()
         for k, v in self.data.items():
             if k == 'avatar':
                 if v:
@@ -368,9 +326,7 @@ class UserDetailForm(BaseForm):
 
 
 class UserAuthForm(BaseForm):
-    auth_type_list = MultiCheckboxField(
-        UserFields.AUTH_TYPE
-    )
+    auth_type_list = MultiCheckboxField(UserFields.AUTH_TYPE)
 
     def __init__(self, *args, **kwargs):
         super(UserAuthForm, self).__init__(*args, **kwargs)
@@ -380,7 +336,7 @@ class UserAuthForm(BaseForm):
         ]
         self.auth_type_list.choices = _choices
         if self._obj and self._obj.auth_info:
-            self.auth_type_list.checked_list = [_ for _ in self._obj.auth_info]
+            self.auth_type_list.checked_list = [int(_) for _ in self._obj.auth_info]
 
     def save(self):
         p = UserInfoProcess(self._obj.user_id)

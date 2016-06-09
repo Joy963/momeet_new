@@ -10,7 +10,7 @@ class UserGender(IntEnum):
     MAN = 2
 
     def describe(self):
-        return USER_GENDER_DESC.get(self.value, '')
+        return USER_GENDER_DESC.get(self.value, u'')
 
 
 USER_GENDER_DESC = {

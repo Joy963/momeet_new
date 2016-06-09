@@ -54,13 +54,18 @@ class User(BaseModel, UserMixin):
     country = db.Column(db.String(20))  # 国家
     location = db.Column(db.String(100), default='0,0')  # 所在城市
 
-    industry_id = db.Column(db.Integer, default=0)  # 行业
-    company_name = db.Column(db.String(100))  # 公司名称
-    profession = db.Column(db.String(100))  # 职位
-    income = db.Column(db.SmallInteger, default=0)  # 年收入
+    # industry_id = db.Column(db.Integer, default=0)  # 行业
+    # company_name = db.Column(db.String(100))  # 公司名称
+    # profession = db.Column(db.String(100))  # 职位
+    # income = db.Column(db.SmallInteger, default=0)  # 年收入
 
-    graduated = db.Column(db.String(100))  # 毕业院校
-    education = db.Column(db.SmallInteger, default=0)  # 学历
+    # graduated = db.Column(db.String(100))  # 毕业院校
+    # education = db.Column(db.SmallInteger, default=0)  # 学历
+
+    engagement = db.relationship('Engagement', backref='user_engagement', lazy='dynamic')
+    edu = db.relationship('EduExperience', backref='user_edu_experience', lazy='dynamic')
+    work = db.relationship('WorkExperience', backref='user_work_experience', lazy='dynamic')
+    photo = db.relationship('UserPhoto', backref='user_photo', lazy='dynamic')
 
     affection = db.Column(db.SmallInteger, default=0)  # 感情状况
     hometown = db.Column(db.String(100), default='0,0')  # 家乡
@@ -97,7 +102,7 @@ class User(BaseModel, UserMixin):
 
 
 class WorkExperience(BaseModel):
-    dict_default_columns = ["id", "company_name", "profession", "income", "industry_id"]
+    dict_default_columns = ["id", "company_name", "profession", "income", "industry_id", "created"]
 
     id = db.Column(db.Integer, nullable=False, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -105,6 +110,7 @@ class WorkExperience(BaseModel):
     company_name = db.Column(db.String(100))  # 公司名称
     profession = db.Column(db.String(100))  # 职位
     income = db.Column(db.SmallInteger, default=0)  # 年收入
+    created = db.Column(db.DateTime, default=datetime.now())
 
     @classmethod
     def get_work_experience(cls, wid):
@@ -112,13 +118,14 @@ class WorkExperience(BaseModel):
 
 
 class EduExperience(BaseModel):
-    dict_default_columns = ["id", "graduated", "education", "major"]
+    dict_default_columns = ["id", "graduated", "education", "major", "created"]
 
     id = db.Column(db.Integer, nullable=False, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     graduated = db.Column(db.String(100))  # 毕业院校
     education = db.Column(db.SmallInteger, default=0)  # 学历
     major = db.Column(db.String(100))   # 专业
+    created = db.Column(db.DateTime, default=datetime.now())
 
     @classmethod
     def get_edu_experience(cls, eid):
