@@ -10,7 +10,8 @@ from momeet.forms.user import (
     UserInfoUpdateForm,
     UserAvatarForm,
     UserEduInfoForm,
-    UserWorkInfoForm
+    UserWorkInfoForm,
+    UserSystemInfoForm
 )
 
 bp = Blueprint('user_info', __name__)
@@ -108,9 +109,19 @@ class UserWorkInfo(BaseView):
         return jsonify({"success": True, "msg": "delete work exprience success"})
 
 
+class UserSystemInfo(BaseView):
+    def post(self, uid=None):
+        form = UserSystemInfoForm(csrf_enabled=False)
+        if uid and form.validate_on_submit():
+            form.save(uid)
+            return jsonify({"success": True, "msg": "OK"})
+        return jsonify({"success": False, "msg": "ERROR"})
+
+
 bp.add_url_rule("avatar/<string:uid>", view_func=UserAvatar.as_view("avatar"))
 bp.add_url_rule("base_info/<string:uid>", view_func=UserBaseInfo.as_view("base_info"))
 bp.add_url_rule("edu_info", view_func=UserEduInfo.as_view("edu_infos"))
 bp.add_url_rule("edu_info/<string:eid>", view_func=UserEduInfo.as_view("edu_info"))
 bp.add_url_rule("work_info", view_func=UserWorkInfo.as_view("work_infos"))
 bp.add_url_rule("work_info/<string:wid>", view_func=UserWorkInfo.as_view("work_info"))
+bp.add_url_rule("system_info/<string:uid>", view_func=UserSystemInfo.as_view("system_info"))

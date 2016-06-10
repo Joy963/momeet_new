@@ -15,9 +15,9 @@ class InvitationCodeForm(BaseForm):
 
     def code_check(self):
         code = InvitationCode.query.filter_by(code=self.code.data).first()
-        if not code:
-            return False, ErrorsEnum.INVITATION_CODE_NON_EXIST.describe()
-        if code.is_used:
-            return False, ErrorsEnum.INVITATION_CODE_INVALID.describe()
-        return True, u"OK"
+        if not code or code and code.code != self.code.data:
+            return False, ErrorsEnum.INVITATION_CODE_NON_EXIST.describe(), u"请输入正确有效的邀请码"
+        if code and code.is_used:
+            return False, ErrorsEnum.INVITATION_CODE_INVALID.describe(), u"请输入正确有效的邀请码"
+        return True, u"OK", u"OK"
 

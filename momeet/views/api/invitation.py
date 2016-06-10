@@ -20,8 +20,8 @@ class InvitationCodeCheck(BaseView):
         form = InvitationCodeForm(csrf_enabled=False)
         if form.validate_on_submit():
             r = form.code_check()
-            return jsonify({"success": r[0], "msg": {"title": r[1], "content": u"请输入正确有效的验证码"}})
-        return jsonify({"success": False, "msg": {"title": u"验证码已过期", "content": u"请输入正确有效的验证码"}})
+            return jsonify({"success": r[0], "msg": {"title": r[1], "content": r[2]}})
+        return jsonify({"success": False, "msg": {"title": u"邀请码已过期", "content": u"请输入正确有效的邀请码"}})
 
 
 bp.add_url_rule("check", view_func=InvitationCodeCheck.as_view("check"))

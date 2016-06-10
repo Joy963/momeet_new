@@ -374,3 +374,19 @@ class UserWorkInfoForm(BaseForm):
             return None
 
 
+class UserSystemInfoForm(BaseForm):
+    device_token = StringField('设备token')
+    app_version = StringField('app 版本')
+    mobile_model = StringField('手机型号')
+    os_version = StringField('os 版本')
+    system_language = StringField('系统语言')
+
+    def save(self, uid):
+        user = get_user(uid)
+        if not user:
+            return False
+        for k, v in self.data.items():
+            if v:
+                setattr(user, k, v)
+        return user.save()
+
