@@ -60,14 +60,18 @@ class User(BaseModel, UserMixin):
 
     industry = db.Column(db.SmallInteger, default=0)  # 行业
     income = db.Column(db.SmallInteger, default=0)  # 年收入
-
     affection = db.Column(db.SmallInteger, default=0)  # 感情状况
     hometown = db.Column(db.String(100), default='0,0')  # 家乡
-
     drink = db.Column(db.SmallInteger, default=0)  # 是否喝酒
     smoke = db.Column(db.SmallInteger, default=0)  # 是否抽烟
     constellation = db.Column(db.SmallInteger, default=0)  # 星座
     religion = db.Column(db.SmallInteger, default=0)  # 信仰
+
+    device_token = db.Column(db.String(100))    # 设备token
+    app_version = db.Column(db.String(30))  # app 版本
+    mobile_model = db.Column(db.String(50))  # 手机型号
+    os_version = db.Column(db.String(30))   # os 版本
+    system_language = db.Column(db.String(30))  # 系统语言
 
     is_active = db.Column(db.Boolean, default=True)
     created = db.Column(db.DateTime, default=datetime.now)

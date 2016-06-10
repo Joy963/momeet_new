@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from flask import Blueprint, jsonify
 from momeet.views.base import BaseView
 from momeet.forms.invitation import InvitationCodeForm
@@ -17,9 +19,10 @@ class InvitationCodeCheck(BaseView):
     def post(self):
         form = InvitationCodeForm(csrf_enabled=False)
         if form.validate_on_submit():
-            return jsonify({"success": form.code_check()})
-        return jsonify({"success": False})
+            r = form.code_check()
+            return jsonify({"success": r[0], "msg": {"title": r[1], "content": u"请输入正确有效的验证码"}})
+        return jsonify({"success": False, "msg": {"title": u"验证码已过期", "content": u"请输入正确有效的验证码"}})
 
 
-bp.add_url_rule("check/", view_func=InvitationCodeCheck.as_view("check"))
-bp.add_url_rule("code/", view_func=GetInvitationCode.as_view("code"))
+bp.add_url_rule("check", view_func=InvitationCodeCheck.as_view("check"))
+bp.add_url_rule("code", view_func=GetInvitationCode.as_view("code"))

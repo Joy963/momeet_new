@@ -4,20 +4,17 @@
 from wtforms import *
 from wtforms.validators import DataRequired, Optional
 
+from momeet.constants.city import CITY_DATA
+from momeet.constants.user import *
 from momeet.forms.base import BaseForm
-from momeet.views.dashboard.error import ErrorsEnum
+from momeet.models.user import *
+from momeet.utils import safe_int, ClearElement, utf8
+from momeet.utils.upload import save_upload_file_to_qiniu, allowed_file
 from momeet.utils.view import (
     CustomRadioField as RadioField,
-    CustomQuerySelectField as QuerySelectField,
     MultiCheckboxField
 )
-from momeet.constants.user import *
-from momeet.constants.city import CITY_DATA
-from momeet.models.user import *
-from momeet.models.engagement import Engagement
-from momeet.utils import safe_int, ClearElement, logger, utf8
-from momeet.utils.upload import save_upload_file_to_qiniu, allowed_file
-
+from momeet.utils.error import ErrorsEnum
 from .fields_name import UserFields
 
 
