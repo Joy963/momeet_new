@@ -54,7 +54,8 @@
               {% for photo in photos %}
               <tr>
                 <td>
-                    <img src="{{photo}}" style="max-width: 200px;max-height: 200px;margin: auto;border-radius: 2px;">
+                    <img src="{{photo}}" style="width: 60px;height: 60px;margin: auto;border-radius: 2px;">
+                    <a href={{ photo }}>{{ photo }}</a>
                 </td>
                 <td>
                   <button type="button" class="btn btn-xs btn-danger btn-del">删除</button>
@@ -81,7 +82,7 @@
       console.log(photo);
       var data = {
         'photo': photo,
-      }
+      };
       if (confirm("确定删除么!")) {
         $.ajax({
           type: "POST",

@@ -134,12 +134,20 @@ class UserPhoto(BaseModel):
     is_active = db.Column(db.Boolean, default=True)
 
 
+class UserDetail(BaseModel):
+    id = db.Column(db.Integer, nullable=False, primary_key=True)
+    user_info_id = db.Column(db.Integer, db.ForeignKey('user_info.user_id'))
+    title = db.Column(db.String(300))
+    content = db.Column(db.String(3000))
+    photo = db.Column(db.Text)
+
+
 class UserInfo(BaseModel):
     user_id = db.Column(db.Integer, nullable=False, primary_key=True)
-    photos = db.Column(db.String(3000))  # 照片
-    description = db.Column(db.String(1000))  # 自我介绍
+    description = db.Column(db.String(1000))  # 个人亮点
     auth_info = db.Column(db.String(3000))  # 认证
-    detail = db.Column(db.LargeBinary)  # 详细介绍
+    detail = db.relationship('UserDetail', backref='user_detail', lazy='dynamic')  # 详细介绍
+    cover_photo = db.Column(db.String(1000))  # 封面照片
 
     @classmethod
     def create(cls, user_id, photos=None, description='', detail=''):
@@ -149,18 +157,6 @@ class UserInfo(BaseModel):
         info.detail = detail
         info.save()
         return info
-
-
-# class UserInvitation(BaseModel):
-#     """
-#     用户支持的邀约
-#     """
-#     id = db.Column(db.Integer, primary_key=True)
-#     user_id = db.Column(db.Integer, nullable=False, index=True)
-#     invitation_type = db.Column(db.SmallInteger, nullable=False)
-#     description = db.Column(db.String(1000))  # 活动介绍
-#     price = db.Column(db.Integer, default=0)  # 活动价格
-#     is_active = db.Column(db.Boolean, default=True)
 
 
 def get_user(user_id):
@@ -248,6 +244,14 @@ class UserInfoProcess(object):
     def get_photos(self):
         return map(lambda x: x.photo, UserPhoto.query.filter_by(
             user_id=self.user_id, is_active=True).all())
+
+    def get_details(self):
+        user_info = UserInfo.query.get(self.user_id)
+        return user_info.detail.all()
+
+    def del_detail(self, did):
+        d = UserDetail.query.get(did)
+        return d.delete() if d else None
 
     def add_photo(self, photo):
         u_p = UserPhoto(user_id=self.user_id)

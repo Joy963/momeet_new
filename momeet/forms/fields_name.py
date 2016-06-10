@@ -34,8 +34,12 @@ class UserFields(object):
     ID_CARD = u'身份证'
 
     PHOTO = u'照片'
-    DESCRIPTION = u'自我描述'
+    COVER_PHOTO = u'封面照'
+    DESCRIPTION = u'个人亮点'
     DETAIL = u'详细描述'
+    DETAIL_TYPE = u'分类'
+    DETAIL_CONTENT = u'内容'
+    DETAIL_PHOTO = u'照片'
 
     INVITATION_DESC = u'邀约描述'
     INVITATION_TYPE = u'邀约类型'

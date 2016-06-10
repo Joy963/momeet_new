@@ -7,7 +7,7 @@ from momeet.models.user import (
     WorkExperience
 )
 from momeet.forms.user import (
-    UserInfoUpdateForm,
+    UserBaseInfoUpdateForm,
     UserAvatarForm,
     UserEduInfoForm,
     UserWorkInfoForm,
@@ -23,7 +23,7 @@ class UserBaseInfo(BaseView):
         return jsonify(user.to_dict_ext() if user else {})
 
     def post(self, uid):
-        form = UserInfoUpdateForm(csrf_enabled=False)
+        form = UserBaseInfoUpdateForm(csrf_enabled=False)
         if form.validate_on_submit() and form.save(uid):
             return jsonify({"success": True})
         return jsonify({"success": False})

@@ -3,7 +3,6 @@
 
 from wtforms import *
 from wtforms.validators import DataRequired, Optional
-
 from momeet.constants.city import CITY_DATA
 from momeet.constants.user import *
 from momeet.forms.base import BaseForm
@@ -207,7 +206,7 @@ class UserForm(BaseForm):
         return user
 
 
-class UserInfoUpdateForm(BaseForm):
+class UserBaseInfoUpdateForm(BaseForm):
     user_name = StringField(UserFields.USER_NAME)
     real_name = StringField(UserFields.REAL_NAME)
     id_card = StringField(UserFields.ID_CARD)
@@ -242,7 +241,7 @@ class UserInfoUpdateForm(BaseForm):
             field.default = '0'
 
     def __init__(self, *args, **kwargs):
-        super(UserInfoUpdateForm, self).__init__(*args, **kwargs)
+        super(UserBaseInfoUpdateForm, self).__init__(*args, **kwargs)
         self.init_choices()
 
     def save(self, uid):
@@ -256,9 +255,7 @@ class UserInfoUpdateForm(BaseForm):
 
 
 class UserPhotoForm(BaseForm):
-    photo = FileField(
-        UserFields.PHOTO
-    )
+    photo = FileField(UserFields.PHOTO)
 
     def validate_photo(self, field):
         data = field.data
@@ -271,6 +268,7 @@ class UserPhotoForm(BaseForm):
     def save(self, user_id):
         process = UserInfoProcess(user_id)
         _file = self.photo.data
+        print self.photo.data
         _photo = save_upload_file_to_qiniu(_file)
         photos = process.add_photo(_photo)
         return photos
@@ -294,25 +292,28 @@ class UserAvatarForm(BaseForm):
 
 
 class UserDetailForm(BaseForm):
-    description = TextAreaField(
-        UserFields.DESCRIPTION,
-        validators=[],
-    )
-    detail = TextAreaField(
-        UserFields.DETAIL,
-        validators=[],
-    )
+    title = StringField(UserFields.DETAIL_TYPE)
+    content = TextAreaField(UserFields.DETAIL_CONTENT)
+    photo = FileField(UserFields.DETAIL_PHOTO, render_kw={'multiple': True})
+
+    def save(self):
+        info = self._obj
+        user_detail = UserDetail(user_info_id=info.user_id)
+        user_detail.title = self.title.data
+        user_detail.content = self.content.data
+        print self.photo
+        # user_detail.photo = save_upload_file_to_qiniu(self.photo.data)
+        return user_detail.save()
+
+
+class UserDescriptionForm(BaseForm):
+    description = TextAreaField(UserFields.DESCRIPTION, validators=[])
 
     def save(self):
         info = self._obj
         info.description = self.description.data.strip()
-        if self.detail.data:
-            clear_obj = ClearElement(self.detail.data)
-            content = utf8(clear_obj.clearup_content())
-            print
-            info.detail = content
         info.save()
-        return info
+        return None
 
 
 class UserAuthForm(BaseForm):

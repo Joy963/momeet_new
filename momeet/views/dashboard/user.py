@@ -14,7 +14,7 @@ from momeet.forms.engagement import EngagementForm
 from momeet.forms.user import (
     UserForm, UserPhotoForm,
     UserDetailForm,
-    # UserInvitationForm,
+    UserDescriptionForm,
     UserAuthForm
 )
 from momeet.models.engagement import UserEngagementProcess
@@ -139,34 +139,54 @@ class UserPhotoDelView(BaseView):
         return jsonify(dict(code=0))
 
 
-class UserDetailView(BaseView):
+class UserDescriptionView(BaseView):
     template_name = "dashboard/user/detail.html"
 
-    def check(self, user_id):
-        user = get_user(user_id)
-        if not user:
-            abort(404)
-        info = get_user_info(user_id)
-        return user, info
-
-    def get(self, user_id):
-        user, info = self.check(user_id)
-        form = UserDetailForm(obj=info)
-        return render_template(
-            self.template_name,
-            form=form,
-            user=user,
-        )
-
     def post(self, user_id):
-        user, info = self.check(user_id)
-        form = UserDetailForm(obj=info)
+        user_info = get_user_info(user_id)
+        form = UserDescriptionForm(obj=user_info)
         if form.validate_on_submit():
             form.save()
             flash(u"修改成功", level='success')
             return redirect(url_for('dashboard.user.detail', user_id=user_id))
         else:
             return render_template(self.template_name, form=form)
+
+
+class UserDetailView(BaseView):
+    template_name = "dashboard/user/detail.html"
+
+    def get(self, user_id):
+        user = get_user(user_id)
+        user_info = get_user_info(user_id)
+        form_dsp = UserDescriptionForm(obj=user_info)
+        form_dtl = UserDetailForm(obj=user_info)
+        process = UserInfoProcess(user_id)
+        user_details = process.get_details()
+        return render_template(
+            self.template_name,
+            form_dsp=form_dsp,
+            form_dtl=form_dtl,
+            user=user,
+            user_details=user_details)
+
+    def post(self, user_id):
+        user_info = get_user_info(user_id)
+        form = UserDetailForm(obj=user_info)
+        if form.validate_on_submit():
+            form.save()
+            flash(u"修改成功", level='success')
+            return redirect(url_for('dashboard.user.detail', user_id=user_id))
+        else:
+            return render_template(self.template_name, form=form)
+
+
+class UserDetailDelView(BaseView):
+    def post(self, user_id):
+        process = UserInfoProcess(user_id)
+        detail_id = request.form.get("detail_id", "")
+        process.del_detail(detail_id)
+        return jsonify(dict(code=0))
 
 
 class UserEngagementView(BaseView):
@@ -229,5 +249,7 @@ bp.add_url_rule("<int:res_id>/", view_func=UserView.as_view("item"))
 bp.add_url_rule("<int:user_id>/photos/", view_func=UserPhotoView.as_view("photos"))
 bp.add_url_rule("<int:user_id>/photo/delete/", view_func=UserPhotoDelView.as_view("photo.delete"))
 bp.add_url_rule("<int:user_id>/detail/", view_func=UserDetailView.as_view("detail"))
+bp.add_url_rule("<int:user_id>/detail/delete", view_func=UserDetailDelView.as_view("detail.delete"))
+bp.add_url_rule("<int:user_id>/description/", view_func=UserDescriptionView.as_view("description"))
 bp.add_url_rule("<int:user_id>/invitation/", view_func=UserEngagementView.as_view("invitation"))
 bp.add_url_rule("<int:user_id>/auth/", view_func=UserAuthView.as_view("auth"))
