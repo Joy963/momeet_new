@@ -265,3 +265,100 @@ INDUSTRY_TYPE_DESC = {
     IndustryTypeEnum.TYPE20: u'政府/社会组织',
     IndustryTypeEnum.TYPE21: u'农林牧渔',
 }
+
+
+class EngagementStatusEnum(IntEnum):
+    TYPE1 = 1
+    TYPE2 = 2
+    TYPE3 = 3
+    TYPE4 = 4
+    TYPE5 = 5
+    TYPE6 = 6
+    TYPE7 = 7
+    TYPE8 = 8
+    TYPE9 = 9
+    TYPE10 = 10
+    TYPE11 = 11
+
+    def describe(self, role):
+        return ENGAGEMENT_STATUS_DESC.get(self.value, {}).get(role, u'')
+
+ENGAGEMENT_STATUS_DESC = {
+    EngagementStatusEnum.TYPE1: {
+        u'guest_list': u'待对方确认',
+        u'guest': u'待对方确认',
+        u'host_list': u'接受/拒绝约见',
+        u'host': u'待确认',
+        u'system': u'待host确认'
+    },
+    EngagementStatusEnum.TYPE2: {
+        u'guest_list': u'已取消',
+        u'guest': u'已取消',
+        u'host_list': u'对方已取消',
+        u'host': u'对方已取消',
+        u'system': u'guest已取消'
+    },
+    EngagementStatusEnum.TYPE3: {
+        u'guest_list': u'预约未接受',
+        u'guest': u'预约未接受',
+        u'host_list': u'已关闭',
+        u'host': u'已关闭',
+        u'system': u'host已拒绝'
+    },
+    EngagementStatusEnum.TYPE4: {
+        u'guest_list': u'待支付',
+        u'guest': u'待支付',
+        u'host_list': u'待对方付款',
+        u'host': u'待对方付款',
+        u'system': u'待guest付款'
+    },
+    EngagementStatusEnum.TYPE5: {
+        u'guest_list': u'待见面',
+        u'guest': u'待见面',
+        u'host_list': u'待对方付款',
+        u'host': u'待对方付款',
+        u'system': u'待支付平台确认'
+    },
+    EngagementStatusEnum.TYPE6: {
+        u'guest_list': u'待见面',
+        u'guest': u'待双方见面',
+        u'host_list': u'待见面',
+        u'host': u'待双方见面',
+        u'system': u'待双方见面'
+    },
+    EngagementStatusEnum.TYPE7: {
+        u'guest_list': u'待退款',
+        u'guest': u'待退款',
+        u'host_list': u'对方已取消',
+        u'host': u'对方已取消',
+        u'system': u'guest约见后取消'
+    },
+    EngagementStatusEnum.TYPE8: {
+        u'guest_list': u'已关闭',
+        u'guest': u'已关闭',
+        u'host_list': u'对方已取消',
+        u'host': u'对方已取消',
+        u'system': u'guest取消已退款'
+    },
+    EngagementStatusEnum.TYPE9: {
+        u'guest_list': u'待退款',
+        u'guest': u'对方已取消，待退款',
+        u'host_list': u'已取消',
+        u'host': u'已取消',
+        u'system': u'host约见后取消'
+    },
+    EngagementStatusEnum.TYPE10: {
+        u'guest_list': u'已退款',
+        u'guest': u'已退款',
+        u'host_list': u'已取消',
+        u'host': u'已取消',
+        u'system': u'host取消已退款'
+    },
+    EngagementStatusEnum.TYPE11: {
+        u'guest_list': u'已完成',
+        u'guest': u'已完成',
+        u'host_list': u'已完成',
+        u'host': u'已完成',
+        u'system': u'约见已完成'
+    }
+}

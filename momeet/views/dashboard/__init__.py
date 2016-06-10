@@ -11,12 +11,14 @@ from momeet.utils import to_unicode, safe_int, logger
 from .misc import bp as dashboard_bp
 from .user import bp as user_bp
 from .account import bp as account_bp
+from .engagement import bp as engagement_bp
 
 
 def regist_routes(app, url_prefix='/dashboard/'):
     app.register_blueprint(dashboard_bp, url_prefix=url_prefix)
     app.register_blueprint(user_bp, url_prefix=url_prefix + 'user/')
     app.register_blueprint(account_bp, url_prefix=url_prefix + 'account/')
+    app.register_blueprint(engagement_bp, url_prefix=url_prefix + 'engagement/')
     return app
 
 

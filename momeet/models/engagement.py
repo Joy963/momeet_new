@@ -4,8 +4,12 @@
 
 from datetime import datetime
 from momeet.lib import BaseModel, db
-from momeet.utils import FancyDict, safe_int
+from momeet.models.user import get_user
+from momeet.constants.user import EngagementStatusEnum
+from momeet.utils import FancyDict, safe_int, Pagination
 from sqlalchemy.event import listens_for
+
+PER_PAGE_COUNT = 15
 
 
 class Theme(BaseModel):
@@ -81,3 +85,27 @@ class UserEngagementProcess(object):
     #                 synchronize_session='fetch'
     #             )
 
+
+class EngagementOrder(BaseModel):
+    dict_default_columns = ['id', 'host', 'guest', 'status', 'created']
+
+    id = db.Column(db.Integer, primary_key=True)
+    host = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    guest = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    status = db.Column(db.SmallInteger)  # 邀约状态
+    created = db.Column(db.DateTime, default=datetime.now())
+
+    def to_dict_ext(self, columns=None):
+        d = self.to_dict(columns)
+        d['host_name'] = get_user(d.get('host')).user_name
+        d['guest_name'] = get_user(d.get('guest')).user_name
+        d['status_name'] = EngagementStatusEnum(d.get('status')).describe('system')
+        return d
+
+
+def get_engagement_order_list_by_page(page=1, **kwargs):
+    kwargs = dict(filter(lambda _: _[1], kwargs.items()))
+    orders = EngagementOrder.query.filter_by(**kwargs).order_by(EngagementOrder.id.desc())
+    orders = orders.paginate(page, PER_PAGE_COUNT)
+    pagination = Pagination(page, PER_PAGE_COUNT, orders.total)
+    return orders.items, pagination
