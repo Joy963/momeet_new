@@ -190,9 +190,12 @@ def get_user_list_by_page(page=1):
 
 
 def get_user_info(user_id):
-    info = UserInfo.query.get(user_id)
+    user = get_user(user_id)
+    if not user:
+        return None
+    info = UserInfo.query.get(user.id)
     if not info:
-        info = UserInfo.create(user_id)
+        info = UserInfo.create(user.id)
     return info
 
 
