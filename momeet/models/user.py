@@ -109,7 +109,7 @@ class WorkExperience(BaseModel):
 
     @classmethod
     def get_work_experience(cls, wid):
-        return WorkExperience.query.get(id_decrypt(wid))
+        return WorkExperience.query.get(wid)
 
 
 class EduExperience(BaseModel):
@@ -124,7 +124,7 @@ class EduExperience(BaseModel):
 
     @classmethod
     def get_edu_experience(cls, eid):
-        return EduExperience.query.get(id_decrypt(eid))
+        return EduExperience.query.get(eid)
 
 
 class UserPhoto(BaseModel):
@@ -167,6 +167,8 @@ class UserInfo(BaseModel):
 
 
 def get_user(user_id):
+    if not user_id:
+        return None
     if str(user_id).isdigit():
         return User.query.get(user_id)
     return User.query.filter_by(social_id=user_id).first()

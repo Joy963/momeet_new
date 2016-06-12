@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from flask import Blueprint, jsonify, request
 from momeet.views.base import BaseView
-from momeet.lib.crypto import id_decrypt, id_encrypt
 from momeet.models.user import (
     get_user,
     get_user_info,
@@ -55,20 +54,20 @@ class UserDetailView(BaseView):
         form = UserDetailForm(csrf_enabled=False, obj=user_info)
         if form.validate_on_submit():
             detail = form.save(request.files)
-            return jsonify({"success": True, "detail_id": id_encrypt(detail.id)} if detail else {{"success": False}})
+            return jsonify({"success": True, "detail_id": detail.id} if detail else {{"success": False}})
         return jsonify({"success": False})
 
     def delete(self, uid=None):
         if not uid:
             return jsonify({"success": False, "msg": "delete user_detail failed"})
-        detail = UserDetail.query.get(id_decrypt(int(uid)))
+        detail = UserDetail.query.get(int(uid))
         detail.delete() if detail else None
         return jsonify({"success": True, "msg": "delete user detail success"})
 
     def put(self, uid=None):
         form = UserDetailForm(csrf_enabled=False)
         if uid and form.validate_on_submit() and \
-                form.update(id_decrypt(int(uid)), files=request.files.getlist('photo')):
+                form.update(int(uid), files=request.files.getlist('photo')):
             return jsonify({"success": True, "msg": "update user detail success"})
         return jsonify({"success": False, "msg": "update user detail failed"})
 
@@ -120,7 +119,7 @@ class UserEduInfoView(BaseView):
         if form.validate_on_submit():
             edu = form.curd('add')
             return jsonify({"success": True,
-                            'edu_id': id_encrypt(edu.id) if edu else None,
+                            'edu_id': edu.id if edu else None,
                             "msg": "add edu exprience success"})
         return jsonify({"success": False, "msg": "add edu exprience failed"})
 
@@ -155,7 +154,7 @@ class UserWorkInfoView(BaseView):
         if form.validate_on_submit():
             work = form.curd('add')
             return jsonify({"success": True,
-                            "work_id": id_encrypt(work.id) if work else None,
+                            "work_id": work.id if work else None,
                             "msg": "add work exprience success"})
         return jsonify({"success": False, "msg": "add work exprience failed"})
 

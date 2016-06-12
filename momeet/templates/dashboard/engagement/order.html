@@ -45,8 +45,9 @@
           </table>
         </div>
       </div>
+    {% if pagination %}
       {{render_pagination(pagination)}}
-
+    {% endif %}
     </div>
   </div>
 </div>

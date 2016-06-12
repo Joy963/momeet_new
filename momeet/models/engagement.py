@@ -4,6 +4,7 @@
 
 from datetime import datetime
 from momeet.lib import BaseModel, db
+from momeet.lib.crypto import id_decrypt
 from momeet.models.user import get_user
 from momeet.constants.user import EngagementStatusEnum
 from momeet.utils import FancyDict, safe_int, Pagination
@@ -92,7 +93,11 @@ class EngagementOrder(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     host = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     guest = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    status = db.Column(db.SmallInteger)  # 邀约状态
+
+    description = db.Column(db.String(5000))  # 约见描述
+    theme = db.Column(db.String(100))   # 约见主题
+
+    status = db.Column(db.SmallInteger)  # 约见状态
     created = db.Column(db.DateTime, default=datetime.now())
 
     def to_dict_ext(self, columns=None):
@@ -103,9 +108,17 @@ class EngagementOrder(BaseModel):
         return d
 
 
+def get_engagement_order(order_id):
+    return EngagementOrder.query.get(safe_int(order_id))
+
+
+def get_engagement_order_list(**kwargs):
+    kwargs = dict(map(lambda x: (x[0], get_user(x[1]).id) if x[0] in ['host', 'guest'] and get_user(x[1]) else x,
+                      filter(lambda _: _[1], kwargs.items())))
+    return EngagementOrder.query.filter_by(**kwargs).order_by(EngagementOrder.id.desc())
+
+
 def get_engagement_order_list_by_page(page=1, **kwargs):
-    kwargs = dict(filter(lambda _: _[1], kwargs.items()))
-    orders = EngagementOrder.query.filter_by(**kwargs).order_by(EngagementOrder.id.desc())
-    orders = orders.paginate(page, PER_PAGE_COUNT)
+    orders = get_engagement_order_list(**kwargs).paginate(page, PER_PAGE_COUNT)
     pagination = Pagination(page, PER_PAGE_COUNT, orders.total)
     return orders.items, pagination

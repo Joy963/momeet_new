@@ -90,7 +90,7 @@ class BaseModel(DefaultModel, SessionMixin):
             columns = self.dict_default_columns
         for col in columns:
             if col == 'id' or col == 'user_id' or col in getattr(self, 'encrypt_attrs', []):
-                value = id_encrypt(getattr(self, col))
+                value = getattr(self, col)
             else:
                 value = getattr(self, col)
             if isinstance(value, datetime.datetime):
