@@ -1,24 +1,31 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from flask import Blueprint, jsonify, request
 from momeet.views.base import BaseView
 from momeet.lib.crypto import id_decrypt, id_encrypt
 from momeet.models.user import (
     get_user,
+    get_user_info,
     EduExperience,
     WorkExperience,
-    UserInfoProcess
+    UserInfoProcess,
+    UserDetail
 )
 from momeet.forms.user import (
     UserBaseInfoUpdateForm,
     UserAvatarForm,
     UserEduInfoForm,
     UserWorkInfoForm,
-    UserSystemInfoForm
+    UserSystemInfoForm,
+    UserCoverPhotoForm,
+    UserDescriptionForm,
+    UserDetailForm
 )
 
 bp = Blueprint('user_info', __name__)
 
 
-class UserBaseInfo(BaseView):
+class UserBaseInfoView(BaseView):
     def get(self, uid):
         user = get_user(uid)
         return jsonify(user.to_dict_ext() if user else {})
@@ -30,7 +37,7 @@ class UserBaseInfo(BaseView):
         return jsonify({"success": False})
 
 
-class UserExtInfo(BaseView):
+class UserExtInfoView(BaseView):
     def get(self, uid):
         process = UserInfoProcess(uid)
         u_info = process.get_userinfo()
@@ -42,7 +49,51 @@ class UserExtInfo(BaseView):
         return jsonify({"success": True, "user_info": result})
 
 
-class UserAvatar(BaseView):
+class UserDetailView(BaseView):
+    def post(self, uid):
+        user_info = get_user_info(uid)
+        form = UserDetailForm(csrf_enabled=False, obj=user_info)
+        if form.validate_on_submit():
+            detail = form.save(request.files)
+            return jsonify({"success": True, "detail_id": id_encrypt(detail.id)} if detail else {{"success": False}})
+        return jsonify({"success": False})
+
+    def delete(self, uid=None):
+        if not uid:
+            return jsonify({"success": False, "msg": "delete user_detail failed"})
+        detail = UserDetail.query.get(id_decrypt(int(uid)))
+        detail.delete() if detail else None
+        return jsonify({"success": True, "msg": "delete user detail success"})
+
+    def put(self, uid=None):
+        form = UserDetailForm(csrf_enabled=False)
+        if uid and form.validate_on_submit() and \
+                form.update(id_decrypt(int(uid)), files=request.files.getlist('photo')):
+            return jsonify({"success": True, "msg": "update user detail success"})
+        return jsonify({"success": False, "msg": "update user detail failed"})
+
+
+class UserDescriptionView(BaseView):
+    def post(self, uid):
+        user_info = get_user_info(uid)
+        form = UserDescriptionForm(csrf_enabled=False, obj=user_info)
+        if form.validate_on_submit() and form.save():
+            return jsonify({"success": True})
+        return jsonify({"success": False})
+
+
+class UserCoverPhotoView(BaseView):
+    def post(self, uid):
+        user_info = get_user_info(uid)
+        form = UserCoverPhotoForm(csrf_enabled=False, obj=user_info)
+        if form.validate_on_submit():
+            uri = form.save(uid)
+            if uri:
+                return jsonify({"success": True, "cover": uri, "msg": ""})
+        return jsonify({"success": False, "msg": "failed update cover!"})
+
+
+class UserAvatarView(BaseView):
     def post(self, uid):
         form = UserAvatarForm(csrf_enabled=False)
         if form.validate_on_submit():
@@ -52,7 +103,7 @@ class UserAvatar(BaseView):
         return jsonify({"success": False, "msg": "failed update avatar!"})
 
 
-class UserEduInfo(BaseView):
+class UserEduInfoView(BaseView):
     def get(self, eid=None):
         if not eid:
             user = get_user(request.args.get('user_id'))
@@ -87,7 +138,7 @@ class UserEduInfo(BaseView):
         return jsonify({"success": True, "msg": "delete edu exprience success"})
 
 
-class UserWorkInfo(BaseView):
+class UserWorkInfoView(BaseView):
     def get(self, wid=None):
         if not wid:
             user = get_user(request.args.get('user_id'))
@@ -122,7 +173,7 @@ class UserWorkInfo(BaseView):
         return jsonify({"success": True, "msg": "delete work exprience success"})
 
 
-class UserSystemInfo(BaseView):
+class UserSystemInfoView(BaseView):
     def post(self, uid=None):
         form = UserSystemInfoForm(csrf_enabled=False)
         if uid and form.validate_on_submit():
@@ -131,11 +182,16 @@ class UserSystemInfo(BaseView):
         return jsonify({"success": False, "msg": "ERROR"})
 
 
-bp.add_url_rule("avatar/<string:uid>", view_func=UserAvatar.as_view("avatar"))
-bp.add_url_rule("base_info/<string:uid>", view_func=UserBaseInfo.as_view("base_info"))
-bp.add_url_rule("ext_info/<string:uid>", view_func=UserExtInfo.as_view("ext_info"))
-bp.add_url_rule("edu_info", view_func=UserEduInfo.as_view("edu_infos"))
-bp.add_url_rule("edu_info/<string:eid>", view_func=UserEduInfo.as_view("edu_info"))
-bp.add_url_rule("work_info", view_func=UserWorkInfo.as_view("work_infos"))
-bp.add_url_rule("work_info/<string:wid>", view_func=UserWorkInfo.as_view("work_info"))
-bp.add_url_rule("system_info/<string:uid>", view_func=UserSystemInfo.as_view("system_info"))
+bp.add_url_rule("cover/<string:uid>", view_func=UserCoverPhotoView.as_view("cover"))
+bp.add_url_rule("description/<string:uid>", view_func=UserDescriptionView.as_view("description"))
+bp.add_url_rule("detail/<string:uid>", view_func=UserDetailView.as_view("detail"))
+bp.add_url_rule("detail/<string:uid>", view_func=UserDetailView.as_view("detail.delete"))
+bp.add_url_rule("ext_info/<string:uid>", view_func=UserExtInfoView.as_view("ext_info"))
+
+bp.add_url_rule("avatar/<string:uid>", view_func=UserAvatarView.as_view("avatar"))
+bp.add_url_rule("base_info/<string:uid>", view_func=UserBaseInfoView.as_view("base_info"))
+bp.add_url_rule("edu_info", view_func=UserEduInfoView.as_view("edu_infos"))
+bp.add_url_rule("edu_info/<string:eid>", view_func=UserEduInfoView.as_view("edu_info"))
+bp.add_url_rule("work_info", view_func=UserWorkInfoView.as_view("work_infos"))
+bp.add_url_rule("work_info/<string:wid>", view_func=UserWorkInfoView.as_view("work_info"))
+bp.add_url_rule("system_info/<string:uid>", view_func=UserSystemInfoView.as_view("system_info"))

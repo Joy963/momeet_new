@@ -1,5 +1,5 @@
 ﻿## BASE_INFO *GET or POST* `/api/user/base_info/<string:uid>`
-####GET
+>####GET
 >**response**
 ```json
 {
@@ -10,7 +10,7 @@
     "user_name": " $$name##"
 }
 ```
-
+>
 ####POST
 >**request (form-data to change)**
 ```form
@@ -55,7 +55,7 @@ or
   "success": true
 }
 ```
-
+>
 ####POST创建 `/api/user/edu_info`
 >**request (form-data)**
 ```form
@@ -70,7 +70,7 @@ or
 ```json
 {"success": True, "msg": "add edu exprience success"}
 ```
-
+>
 #### PUT 修改 `/api/user/edu_info/<string:uid>`
 >**request (form-data)**
 ```form
@@ -85,7 +85,7 @@ or
 ```json
 {"success": True, "msg": "update edu exprience success"}
 ```
-
+>
 #### DELETE 删除 `/api/user/edu_info/<string:uid>`
 >**reponse**
 ```json
@@ -108,7 +108,7 @@ or
   "success": true
 }
 ```
-
+>
 ####POST 创建 `/api/user/work_info`
 >**request (form-data)**
 ```form
@@ -122,7 +122,7 @@ or
 >**reponse**
 ```json
 {"success": True, "msg": "add work exprience success"}
-
+```
 #### PUT 修改 `/api/user/work_info/<string:uid>`
 >**request (form-data)**
 ```form
@@ -137,7 +137,7 @@ or
 ```json
 {"success": True, "msg": "update work exprience success"}
 ```
-
+>
 #### DELETE 删除 `/api/user/work_info/<string:uid>`
 >**reponse**
 ```json
@@ -145,3 +145,94 @@ or
 ```
 
 
+## EXT_INFO *GET* 个人扩展信息
+>####GET所有 `/api/user/ext_info/<string:uid>`
+**response (json)**
+```json
+{
+    "success": true,
+    "user_info": {
+        "auth_info": "认证信息",
+        "cover_photo": "封面照片",
+        "description": "个人亮点",
+        "detail": [   #"详情列表"
+            {
+                "content": "content",
+                "id": 2516876993,
+                "photo": ["1~2张照片列表"],
+                "title": "title"
+            }
+        ],
+        "user_id": 2516877019
+    }
+}
+```
+
+## DETAIL *POST* 个人详细信息
+>####POST创建 `/api/user/detail/<string:uid>` #uid: user ID
+**request (form-data)**
+```form
+"title": "",
+"content": "",
+"photo": <File>
+```
+**response**
+```json
+{
+  "detail_id": 2516876999,
+  "success": true
+}
+```
+
+>####PUT修改 `/api/user/detail/<string:did>`  #did: detail ID
+**request (form-data)**
+```form
+"title": "",
+"content": "",
+"photo": <File>
+```
+**response**
+```json
+{
+  "msg": "update user detail success",
+  "success": true
+}
+```
+
+>####DELETE修改 `/api/user/detail/<string:did>` #did: detail ID
+**response**
+```json
+{
+  "msg": "delete user detail success",
+  "success": true
+}
+```
+
+
+## DESCRIPTION *POST* 个人亮点
+>####POST创建 `/api/user/description/<string:uid>`
+**request (form-data)**
+```form
+"description": ""
+```
+**response**
+```json
+{
+  "success": true
+}
+```
+
+## COVER PHOTO *POST* 个人封面照片
+>####POST创建 `/api/user/cover/<string:uid>`
+**request (form-data)**
+```form
+"photo": <File>
+```
+**response**
+```json
+{
+  "cover": "http://test_url/test",
+  "msg": "",
+  "success": true
+}
+```

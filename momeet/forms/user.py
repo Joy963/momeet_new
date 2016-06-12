@@ -304,6 +304,8 @@ class UserCoverPhotoForm(BaseForm):
     def save(self, uid):
         process = UserInfoProcess(uid)
         _file = self.photo.data
+        if not self.photo.data:
+            return None
         _avatar = save_upload_file_to_qiniu(_file)
         return process.update_cover_photo(_avatar)
 
@@ -325,6 +327,20 @@ class UserDetailForm(BaseForm):
         user_detail.photo = ','.join(photo)
         return user_detail.save()
 
+    def update(self, detail_id, files=None):
+        user_detail = UserDetail.query.get(detail_id)
+        d = dict(filter(lambda x: x[0] != 'photo' and x[1], self.data.items()))
+        for k, v in d.items():
+            setattr(user_detail, k, v) if v else None
+
+        if files:
+            photo = []
+            for f in files:
+                _photo = save_upload_file_to_qiniu(f)
+                photo.append(_photo)
+            user_detail.photo = ','.join(photo)
+        return user_detail.save()
+
 
 class UserDescriptionForm(BaseForm):
     description = TextAreaField(UserFields.DESCRIPTION, validators=[])
@@ -332,8 +348,7 @@ class UserDescriptionForm(BaseForm):
     def save(self):
         info = self._obj
         info.description = self.description.data.strip()
-        info.save()
-        return None
+        return info.save()
 
 
 class UserAuthForm(BaseForm):
