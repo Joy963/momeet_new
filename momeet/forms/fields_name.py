@@ -45,5 +45,9 @@ class UserFields(object):
     INVITATION_TYPE = u'邀约类型'
     INVITATION_PRICE = u'邀约价格'
 
+    INVITATION_HOST = u'约见接收'
+    INVITATION_GUEST = u'约见发起'
+
     AUTH_TYPE = u'认证类型'
+
 

@@ -9,7 +9,10 @@ from momeet.models.engagement import (
     get_engagement_order_list
 )
 from momeet.models.user import get_user
-from momeet.forms.engagement import EngagementForm
+from momeet.forms.engagement import (
+    EngagementForm,
+    EngagementOrderForm
+)
 from momeet.utils.common import safe_int
 
 
@@ -47,16 +50,11 @@ class EngagementOrderView(BaseView):
         return jsonify({"success": True, "results": map(lambda x: x.to_dict_ext(), items)})
 
     def post(self):
-        params = json.loads(request.data)
-        host = params.get('host', 0)
-        guest = params.get('guest', 0)
-        description = params.get('description', '')
-        theme = params.get('theme', [])
-
-        order = EngagementOrder()
-        order.host = get_user(host).id if get_user(host) else None
-
-        return ""
+        order_form = EngagementOrderForm(csrf_enabled=False)
+        if order_form.validate_on_submit():
+            order = order_form.save(request.form.getlist('theme'))
+            return jsonify(order.to_dict() if order else {})
+        return "End"
 
 
 bp.add_url_rule("list/<string:uid>/", view_func=EngagementView.as_view("list"))

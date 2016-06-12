@@ -4,11 +4,13 @@
 
 from datetime import datetime
 from momeet.lib import BaseModel, db
-from momeet.lib.crypto import id_decrypt
 from momeet.models.user import get_user
 from momeet.constants.user import EngagementStatusEnum
 from momeet.utils import FancyDict, safe_int, Pagination
+from momeet.constants.user import EngagementStatusEnum, ENGAGEMENT_STATUS_DESC
 from sqlalchemy.event import listens_for
+
+from sqlalchemy.orm.interfaces import MapperExtension
 
 PER_PAGE_COUNT = 15
 
@@ -88,7 +90,7 @@ class UserEngagementProcess(object):
 
 
 class EngagementOrder(BaseModel):
-    dict_default_columns = ['id', 'host', 'guest', 'status', 'created']
+    dict_default_columns = ['id', 'host', 'guest', 'status', 'created', 'description', 'theme']
 
     id = db.Column(db.Integer, primary_key=True)
     host = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -104,7 +106,8 @@ class EngagementOrder(BaseModel):
         d = self.to_dict(columns)
         d['host_name'] = get_user(d.get('host')).user_name
         d['guest_name'] = get_user(d.get('guest')).user_name
-        d['status_name'] = EngagementStatusEnum(d.get('status')).describe('system')
+        status = d.get('status')
+        d['status_name'] = EngagementStatusEnum(status).describe('system') if status else ""
         return d
 
 
@@ -122,3 +125,17 @@ def get_engagement_order_list_by_page(page=1, **kwargs):
     orders = get_engagement_order_list(**kwargs).paginate(page, PER_PAGE_COUNT)
     pagination = Pagination(page, PER_PAGE_COUNT, orders.total)
     return orders.items, pagination
+
+
+@listens_for(EngagementOrder, 'after_insert')
+def receive_after_insert(mapper, connection, target):
+    print target
+    # target.status = 1
+    # target.save()
+
+
+# class MyExtension(MapperExtension):
+#     def before_insert(self, mapper, connection, instance):
+#         print "instance %s before insert !" % instance
+#
+# m = mapper(User, users_table, extension=MyExtension())

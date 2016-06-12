@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 
 
-from wtforms import validators, IntegerField, TextAreaField
+from wtforms import validators, IntegerField, TextAreaField, StringField
 from momeet.forms.base import BaseForm
-from momeet.models.engagement import Engagement, Theme
+from momeet.models.user import get_user
+from momeet.models.engagement import Engagement, Theme, EngagementOrder
 from momeet.utils.view import MultiCheckboxField
-
 from .fields_name import UserFields
+from momeet.utils.error import ErrorsEnum
 from momeet.constants.user import InvitationTypeEnum
 
 
@@ -45,9 +46,39 @@ class EngagementForm(BaseForm):
         return engagement
 
 
-class EngagementOrder(BaseForm):
-    pass
-    # host = IntegerField('', [validators.required()])
-    # guest = params.get('guest', 0)
-    # description = params.get('description', '')
-    # theme = params.get('theme', [])
+class EngagementOrderForm(BaseForm):
+    host = IntegerField(UserFields.INVITATION_HOST, [validators.required()])
+    guest = IntegerField(UserFields.INVITATION_GUEST, [validators.required()])
+    description = TextAreaField(UserFields.INVITATION_DESC, [validators.required()])
+    theme = StringField(UserFields.INVITATION_TYPE, [validators.required()])
+
+    def validate_host(self, field):
+        data = field.data
+        if not data:
+            return
+        try:
+            int(data)
+        except:
+            raise ValueError(ErrorsEnum.HEIGHT_ERROR.describe())
+
+    def validate_guest(self, field):
+        data = field.data
+        if not data:
+            return
+        try:
+            int(data)
+        except:
+            raise ValueError(ErrorsEnum.HEIGHT_ERROR.describe())
+
+    def save(self, theme=None):
+        host = get_user(self.host.data)
+        guest = get_user(self.guest.data)
+        if not host or not guest:
+            return None
+        order = EngagementOrder()
+        order.host = host.id
+        order.guest = guest.id
+        order.theme = ','.join(theme)
+        order.description = self.description.data
+        order.status = 1
+        return order.save()

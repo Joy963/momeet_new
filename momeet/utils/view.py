@@ -6,7 +6,7 @@ from flask import flash as flask_flash
 
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms import RadioField, SelectField
-from wtforms import widgets, SelectMultipleField
+from wtforms import widgets, SelectMultipleField, TextField
 
 
 def flash(message, level='info', category='message'):
@@ -50,3 +50,4 @@ class CustomSelectField(SelectField):
 class MultiCheckboxField(SelectMultipleField):
     widget = widgets.ListWidget(prefix_label=False)
     option_widget = widgets.CheckboxInput()
+
