@@ -38,12 +38,21 @@
           </form>
         </div>
 
+        <div class="panel-body">
+          <form class="form-horizontal group-border hover-stripped" role="form" method="post" id="user_form"
+                action='{{ url_for('dashboard.user.cover', user_id=user.id) }}'
+                enctype="multipart/form-data" accept="image/*">
+            {{ form_dsp.csrf_token }}
+            {{ form_filefield(form_cover.photo) }}
+            {{ form_submit() }}
+          </form>
+        </div>
       </div>
 
 
       <div class="panel panel-default">
           <div class="panel-body">
-              <label>详细添加</label>
+              <label>个人详情</label>
             <form class="form-horizontal group-border hover-stripped" role="form" method="post" id="user_form"
                   action='{{ url_for('dashboard.user.detail', user_id=user.id) }}'
                   enctype="multipart/form-data" accept="image/*">

@@ -15,7 +15,8 @@ from momeet.forms.user import (
     UserForm, UserPhotoForm,
     UserDetailForm,
     UserDescriptionForm,
-    UserAuthForm
+    UserAuthForm,
+    UserCoverPhotoForm
 )
 from momeet.models.engagement import UserEngagementProcess
 from momeet.models.user import (
@@ -147,7 +148,21 @@ class UserDescriptionView(BaseView):
         form = UserDescriptionForm(obj=user_info)
         if form.validate_on_submit():
             form.save()
-            flash(u"修改成功", level='success')
+            flash(u"提交成功", level='success')
+            return redirect(url_for('dashboard.user.detail', user_id=user_id))
+        else:
+            return render_template(self.template_name, form=form)
+
+
+class UserCoverPhotoView(BaseView):
+    template_name = "dashboard/user/detail.html"
+
+    def post(self, user_id):
+        user_info = get_user_info(user_id)
+        form = UserCoverPhotoForm(obj=user_info)
+        if form.validate_on_submit():
+            form.save(user_id)
+            flash(u"提交成功", level='success')
             return redirect(url_for('dashboard.user.detail', user_id=user_id))
         else:
             return render_template(self.template_name, form=form)
@@ -161,12 +176,14 @@ class UserDetailView(BaseView):
         user_info = get_user_info(user_id)
         form_dsp = UserDescriptionForm(obj=user_info)
         form_dtl = UserDetailForm(obj=user_info)
+        form_cover = UserCoverPhotoForm(obj=user_info)
         process = UserInfoProcess(user_id)
         user_details = process.get_details()
         return render_template(
             self.template_name,
             form_dsp=form_dsp,
             form_dtl=form_dtl,
+            form_cover=form_cover,
             user=user,
             user_details=user_details)
 
@@ -250,6 +267,7 @@ bp.add_url_rule("<int:user_id>/photos/", view_func=UserPhotoView.as_view("photos
 bp.add_url_rule("<int:user_id>/photo/delete/", view_func=UserPhotoDelView.as_view("photo.delete"))
 bp.add_url_rule("<int:user_id>/detail/", view_func=UserDetailView.as_view("detail"))
 bp.add_url_rule("<int:user_id>/detail/delete", view_func=UserDetailDelView.as_view("detail.delete"))
+bp.add_url_rule("<int:user_id>/cover/", view_func=UserCoverPhotoView.as_view("cover"))
 bp.add_url_rule("<int:user_id>/description/", view_func=UserDescriptionView.as_view("description"))
 bp.add_url_rule("<int:user_id>/invitation/", view_func=UserEngagementView.as_view("invitation"))
 bp.add_url_rule("<int:user_id>/auth/", view_func=UserAuthView.as_view("auth"))

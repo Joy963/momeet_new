@@ -291,6 +291,23 @@ class UserAvatarForm(BaseForm):
         return process.update_avatar(_avatar)
 
 
+class UserCoverPhotoForm(BaseForm):
+    photo = FileField(UserFields.COVER_PHOTO)
+
+    def validate_avatar(self, field):
+        if not field.data:
+            return
+        filename = field.data.filename
+        if not allowed_file(filename):
+            raise ValueError(ErrorsEnum.IMAGE_ERROR.describe())
+
+    def save(self, uid):
+        process = UserInfoProcess(uid)
+        _file = self.photo.data
+        _avatar = save_upload_file_to_qiniu(_file)
+        return process.update_cover_photo(_avatar)
+
+
 class UserDetailForm(BaseForm):
     title = StringField(UserFields.DETAIL_TYPE)
     content = TextAreaField(UserFields.DETAIL_CONTENT)

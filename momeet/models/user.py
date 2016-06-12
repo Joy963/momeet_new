@@ -247,12 +247,21 @@ class UserInfoProcess(object):
 
     def __init__(self, user_id):
         self.user_id = user_id
+        self.user = get_user(self.user_id)
+
+    def update_cover_photo(self, photo_uri):
+        if not self.user:
+            return None
+        user_info = UserInfo.query.get(self.user.id)
+        user_info.cover_photo = photo_uri
+        user_info.save()
+        return photo_uri
 
     def get_userinfo(self):
-        return UserInfo.query.get(self.user_id)
+        return UserInfo.query.get(self.user.id)
 
     def get_details(self):
-        user_info = UserInfo.query.get(self.user_id)
+        user_info = UserInfo.query.get(self.user.id)
         return user_info.detail.all()
 
     def del_detail(self, did):
