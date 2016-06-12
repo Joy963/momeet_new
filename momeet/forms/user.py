@@ -329,6 +329,8 @@ class UserDetailForm(BaseForm):
 
     def update(self, detail_id, files=None):
         user_detail = UserDetail.query.get(detail_id)
+        if not user_detail:
+            return None
         d = dict(filter(lambda x: x[0] != 'photo' and x[1], self.data.items()))
         for k, v in d.items():
             setattr(user_detail, k, v) if v else None
