@@ -135,14 +135,21 @@ class UserPhoto(BaseModel):
 
 
 class UserDetail(BaseModel):
+    dict_default_columns = ['id', 'title', 'content', 'photo']
     id = db.Column(db.Integer, nullable=False, primary_key=True)
     user_info_id = db.Column(db.Integer, db.ForeignKey('user_info.user_id'))
     title = db.Column(db.String(300))
     content = db.Column(db.String(3000))
     photo = db.Column(db.Text)
 
+    def to_dict_ext(self, columns=None):
+        d = self.to_dict(columns)
+        d['photo'] = d.get('photo').split(',')
+        return d
+
 
 class UserInfo(BaseModel):
+    dict_default_columns = ['user_id', 'description', 'auth_info', 'cover_photo']
     user_id = db.Column(db.Integer, nullable=False, primary_key=True)
     description = db.Column(db.String(1000))  # 个人亮点
     auth_info = db.Column(db.String(3000))  # 认证
@@ -241,9 +248,8 @@ class UserInfoProcess(object):
     def __init__(self, user_id):
         self.user_id = user_id
 
-    def get_photos(self):
-        return map(lambda x: x.photo, UserPhoto.query.filter_by(
-            user_id=self.user_id, is_active=True).all())
+    def get_userinfo(self):
+        return UserInfo.query.get(self.user_id)
 
     def get_details(self):
         user_info = UserInfo.query.get(self.user_id)
@@ -252,6 +258,10 @@ class UserInfoProcess(object):
     def del_detail(self, did):
         d = UserDetail.query.get(did)
         return d.delete() if d else None
+
+    def get_photos(self):
+        return map(lambda x: x.photo, UserPhoto.query.filter_by(
+            user_id=self.user_id, is_active=True).all())
 
     def add_photo(self, photo):
         u_p = UserPhoto(user_id=self.user_id)

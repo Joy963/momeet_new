@@ -174,7 +174,7 @@ class UserDetailView(BaseView):
         user_info = get_user_info(user_id)
         form = UserDetailForm(obj=user_info)
         if form.validate_on_submit():
-            form.save()
+            form.save(request.files)
             flash(u"修改成功", level='success')
             return redirect(url_for('dashboard.user.detail', user_id=user_id))
         else:

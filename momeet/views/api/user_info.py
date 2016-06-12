@@ -4,7 +4,8 @@ from momeet.lib.crypto import id_decrypt, id_encrypt
 from momeet.models.user import (
     get_user,
     EduExperience,
-    WorkExperience
+    WorkExperience,
+    UserInfoProcess
 )
 from momeet.forms.user import (
     UserBaseInfoUpdateForm,
@@ -27,6 +28,18 @@ class UserBaseInfo(BaseView):
         if form.validate_on_submit() and form.save(uid):
             return jsonify({"success": True})
         return jsonify({"success": False})
+
+
+class UserExtInfo(BaseView):
+    def get(self, uid):
+        process = UserInfoProcess(uid)
+        u_info = process.get_userinfo()
+        result = dict()
+        if u_info:
+            result = u_info.to_dict()
+            u_detail = u_info.detail.all()
+            result['detail'] = map(lambda x: x.to_dict_ext(), u_detail)
+        return jsonify({"success": True, "user_info": result})
 
 
 class UserAvatar(BaseView):
@@ -120,6 +133,7 @@ class UserSystemInfo(BaseView):
 
 bp.add_url_rule("avatar/<string:uid>", view_func=UserAvatar.as_view("avatar"))
 bp.add_url_rule("base_info/<string:uid>", view_func=UserBaseInfo.as_view("base_info"))
+bp.add_url_rule("ext_info/<string:uid>", view_func=UserExtInfo.as_view("ext_info"))
 bp.add_url_rule("edu_info", view_func=UserEduInfo.as_view("edu_infos"))
 bp.add_url_rule("edu_info/<string:eid>", view_func=UserEduInfo.as_view("edu_info"))
 bp.add_url_rule("work_info", view_func=UserWorkInfo.as_view("work_infos"))

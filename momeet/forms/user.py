@@ -296,13 +296,16 @@ class UserDetailForm(BaseForm):
     content = TextAreaField(UserFields.DETAIL_CONTENT)
     photo = FileField(UserFields.DETAIL_PHOTO, render_kw={'multiple': True})
 
-    def save(self):
+    def save(self, files):
         info = self._obj
         user_detail = UserDetail(user_info_id=info.user_id)
         user_detail.title = self.title.data
         user_detail.content = self.content.data
-        print self.photo
-        # user_detail.photo = save_upload_file_to_qiniu(self.photo.data)
+        photo = []
+        for f in files.getlist('photo'):
+            _photo = save_upload_file_to_qiniu(f)
+            photo.append(_photo)
+        user_detail.photo = ','.join(photo)
         return user_detail.save()
 
 

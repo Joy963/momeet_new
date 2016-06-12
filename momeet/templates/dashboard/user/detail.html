@@ -80,7 +80,11 @@
                 <td>{{ detail.title }}</td>
                 <td>{{ detail.content[:40] }}</td>
                 <td>
-                {% if detail.photo %}<a href="{{ detail.photo }}"><img src="{{detail.photo}}" style="width: 60px;height: 60px;margin: auto;border-radius: 2px;"></a>{% endif %}
+                {% if detail.photo %}
+                    {% for p in detail.photo.split(',') %}
+                    <a href="{{ p }}"><img src="{{p}}" style="width: 60px;height: 60px;margin: auto;border-radius: 2px;"></a>
+                    {% endfor %}
+                {% endif %}
                 <button type="button" class="btn btn-xs btn-danger btn-del">删除</button></td>
               </tr>
               {% endfor %}
