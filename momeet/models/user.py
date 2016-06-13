@@ -101,10 +101,11 @@ class User(BaseModel, UserMixin):
 
     def to_dict_ext(self, columns=None):
         d = self.to_dict(columns=columns)
-        completeness, msg = get_user_info_completeness(self.id)
+        completeness, msg, next_page = get_user_info_completeness(self.id)
         d['completeness'] = {
             'completeness': completeness,
-            'msg': msg
+            'msg': msg,
+            'next_page': next_page
         }
         d['birthday'] = d.get('birthday')[:10]
         d['work_expirence'] = map(lambda x: x.to_dict(), self.work.all())
@@ -216,6 +217,7 @@ def get_user_info(user_id):
 def get_user_info_completeness(user_id=None):
     complete = 0
     msg = u''
+    next_page = 0
     user = get_user(user_id)
     user_info = UserInfo.query.get(user.id)
     if not user:
@@ -254,12 +256,14 @@ def get_user_info_completeness(user_id=None):
                 job_label_flag = True
             else:
                 msg = u'职业标签还未编辑哦'
+                next_page = 2
         if _ == 'user_description':
             if user_info_dict.description:
                 complete += 1
                 description_flag = True
             else:
                 msg = u'编辑个人亮点后可上首页哦'
+                next_page = 3
         if _ == 'user_cover_photo' and user_info_dict.cover_photo:
             complete += 1
         if _ == 'user_detail':
@@ -268,15 +272,17 @@ def get_user_info_completeness(user_id=None):
                 detail_flag = True
             else:
                 msg = u'完善更多介绍约见成功率更高哦'
+                next_page = 4
 
     if ext_complete <= 3:
         msg = u'完善资料开始约见吧'
+        next_page = 1
     elif job_label_flag and description_flag and detail_flag:
         msg = user.job_label
 
     complete = int((complete + base_complete + ext_complete)*100.0/
                    len(base_info + ext_info + other_info))
-    return complete, msg
+    return complete, msg, next_page
 
 
 class UserProcess(object):

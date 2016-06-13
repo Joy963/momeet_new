@@ -428,3 +428,6 @@ class UserSystemInfoForm(BaseForm):
                 setattr(user, k, v)
         return user.save()
 
+
+class UserSearchForm(BaseForm):
+    text = StringField(u'用户搜索', [validators.required()])
