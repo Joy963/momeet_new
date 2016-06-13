@@ -6,6 +6,7 @@ from flask_login import UserMixin
 from momeet.lib import BaseModel, db
 from momeet.utils import utf8
 from momeet.utils.common import FancyDict
+from sqlalchemy import or_
 
 
 USER_PER_PAGE_COUNT = 20
@@ -197,9 +198,9 @@ def get_user_by_social_id(social_id):
     return User.query.filter_by(social_id=social_id).first()
 
 
-def get_user_list_by_page(page=1):
-    query_kwargs = dict(is_active=True)
-    users = User.query.filter_by(**query_kwargs)
+def get_user_list_by_page(page=1, **kwargs):
+    users = User.query.filter(or_(getattr(User, k) == v for k, v in kwargs.items()))\
+        .filter_by(is_active=True)
     users = users.order_by(User.id.desc()).paginate(page, USER_PER_PAGE_COUNT)
     return users.items, users.total
 

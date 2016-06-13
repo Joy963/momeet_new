@@ -37,7 +37,7 @@ class UserListView(BaseView):
 
     def page_data(self):
         page = safe_int(request.args.get("page", 1))
-        items, count = get_user_list_by_page(page=page)
+        items, count = get_user_list_by_page(page=page, **request.args)
         pagination = Pagination(page, USER_PER_PAGE_COUNT, count)
         return dict(
             items=items,

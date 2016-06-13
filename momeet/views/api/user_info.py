@@ -194,3 +194,5 @@ bp.add_url_rule("edu_info/<string:eid>", view_func=UserEduInfoView.as_view("edu_
 bp.add_url_rule("work_info", view_func=UserWorkInfoView.as_view("work_infos"))
 bp.add_url_rule("work_info/<string:wid>", view_func=UserWorkInfoView.as_view("work_info"))
 bp.add_url_rule("system_info/<string:uid>", view_func=UserSystemInfoView.as_view("system_info"))
+
+

@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, render_template, jsonify, request
+from flask import Blueprint, render_template, jsonify, request, redirect, url_for
 from momeet.constants.city import CITY_DATA
 from momeet.utils.upload import save_upload_file_to_qiniu
 from momeet.views.base import BaseView
-from momeet.forms.user import UserSearchForm
 
 
 bp = Blueprint('dashboard', __name__)
@@ -13,8 +12,12 @@ bp = Blueprint('dashboard', __name__)
 
 class IndexView(BaseView):
     def get(self):
-        form = UserSearchForm()
-        return render_template("dashboard/index.html", form=form)
+        q = request.args.get('q')
+        if not q:
+            return render_template("dashboard/index.html")
+        else:
+            return redirect(url_for('dashboard.user.list', weixin_num=q,
+                                    mobile_num=q, real_name=q))
 
 
 class CitiesView(BaseView):
