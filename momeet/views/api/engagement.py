@@ -6,7 +6,8 @@ from momeet.models.engagement import (
     Engagement,
     EngagementOrder,
     UserEngagementProcess,
-    get_engagement_order_list
+    get_engagement_order_list,
+    get_engagement_order
 )
 from momeet.models.user import get_user
 from momeet.forms.engagement import (
@@ -57,5 +58,16 @@ class EngagementOrderView(BaseView):
         return "End"
 
 
+class EngagementOrderStatus(BaseView):
+    def post(self, oid, action):
+        order = get_engagement_order(oid)
+        if not order:
+            return jsonify({"success": False})
+        order.status = 2
+        return jsonify({"success": True})
+
+
 bp.add_url_rule("list/<string:uid>/", view_func=EngagementView.as_view("list"))
 bp.add_url_rule("order/", view_func=EngagementOrderView.as_view("order"))
+
+bp.add_url_rule("order/<string:oid>/<string:action>", view_func=EngagementOrderStatus.as_view("order.update"))

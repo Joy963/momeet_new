@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
+from uuid import uuid4
 from datetime import datetime
 from momeet.lib import BaseModel, db
 from momeet.models.user import get_user
@@ -92,7 +92,7 @@ class UserEngagementProcess(object):
 class EngagementOrder(BaseModel):
     dict_default_columns = ['id', 'host', 'guest', 'status', 'created', 'description', 'theme']
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(32), default=lambda : unicode(uuid4()).replace('-', '').upper(), primary_key=True)
     host = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     guest = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
@@ -133,6 +133,15 @@ def receive_after_insert(mapper, connection, target):
     # target.status = 1
     # target.save()
 
+
+@listens_for(EngagementOrder, 'after_update')
+def receive_after_update(mapper, connection, target):
+    print target, 'UPDATE'
+
+
+@listens_for(EngagementOrder.status, 'set', named=True)
+def receive_set(**kw):
+    print kw
 
 # class MyExtension(MapperExtension):
 #     def before_insert(self, mapper, connection, instance):

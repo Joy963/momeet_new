@@ -5,10 +5,9 @@
 from wtforms import validators, IntegerField, TextAreaField, StringField
 from momeet.forms.base import BaseForm
 from momeet.models.user import get_user
-from momeet.models.engagement import Engagement, Theme, EngagementOrder
+from momeet.models.engagement import Engagement, Theme, EngagementOrder, get_engagement_order
 from momeet.utils.view import MultiCheckboxField
 from .fields_name import UserFields
-from momeet.utils.error import ErrorsEnum
 from momeet.constants.user import InvitationTypeEnum
 
 
@@ -47,28 +46,10 @@ class EngagementForm(BaseForm):
 
 
 class EngagementOrderForm(BaseForm):
-    host = IntegerField(UserFields.INVITATION_HOST, [validators.required()])
-    guest = IntegerField(UserFields.INVITATION_GUEST, [validators.required()])
-    description = TextAreaField(UserFields.INVITATION_DESC, [validators.required()])
-    theme = StringField(UserFields.INVITATION_TYPE, [validators.required()])
-
-    def validate_host(self, field):
-        data = field.data
-        if not data:
-            return
-        try:
-            int(data)
-        except:
-            raise ValueError(ErrorsEnum.HEIGHT_ERROR.describe())
-
-    def validate_guest(self, field):
-        data = field.data
-        if not data:
-            return
-        try:
-            int(data)
-        except:
-            raise ValueError(ErrorsEnum.HEIGHT_ERROR.describe())
+    host = IntegerField(UserFields.INVITATION_HOST)
+    guest = IntegerField(UserFields.INVITATION_GUEST)
+    description = TextAreaField(UserFields.INVITATION_DESC)
+    theme = StringField(UserFields.INVITATION_TYPE)
 
     def save(self, theme=None):
         host = get_user(self.host.data)
@@ -82,3 +63,4 @@ class EngagementOrderForm(BaseForm):
         order.description = self.description.data
         order.status = 1
         return order.save()
+

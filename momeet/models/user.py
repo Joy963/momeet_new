@@ -5,7 +5,7 @@ from datetime import datetime
 from flask_login import UserMixin
 from momeet.lib import BaseModel, db
 from momeet.utils import utf8
-from momeet.lib.crypto import id_decrypt
+from momeet.utils.common import FancyDict
 
 
 USER_PER_PAGE_COUNT = 20
@@ -92,6 +92,11 @@ class User(BaseModel, UserMixin):
 
     def to_dict_ext(self, columns=None):
         d = self.to_dict(columns=columns)
+        completeness = get_user_info_completeness(self.id)
+        d['completeness'] = {
+            'completeness': completeness,
+            'msg': u'完善资料开始约见吧' if completeness < 80 else u''
+        }
         d['birthday'] = d.get('birthday')[:10]
         d['work_expirence'] = map(lambda x: x.to_dict(), self.work.all())
         d['edu_expirence'] = map(lambda x: x.to_dict(), self.edu.all())
@@ -199,6 +204,36 @@ def get_user_info(user_id):
     return info
 
 
+def get_user_info_completeness(user_id=None):
+    complete = 0
+    user = get_user(user_id)
+    user_info = UserInfo.query.get(user.id)
+    if not user:
+        return complete
+    user_dict = user.to_dict()
+    user_info_dict = user_info.to_dict() if user_info else FancyDict()
+    statistics = ['avatar', 'real_name', 'gender', 'birthday',
+                  'height', 'mobile_num', 'weixin_num', 'location',
+                  'industry', 'income', 'affection', 'hometown',
+                  'constellation', 'edu', 'work', 'job_lable',
+                  'user_description', 'user_cover_photo',
+                  'user_detail']
+    for _ in statistics:
+        if _ in user_dict.keys() and user_dict.get(_):
+            complete += 1
+        elif _ == 'edu' and user.edu.all():
+            complete += 1
+        elif _ == 'work' and user.work.all():
+            complete += 1
+        elif _ == 'user_description' and user_info_dict.description:
+            complete += 1
+        elif _ == 'user_cover_photo' and user_info_dict.cover_photo:
+            complete += 1
+        elif _ == 'user_detail' and user_info.detail.count():
+            complete += 1
+    return int(complete*100.0/len(statistics))
+
+
 class UserProcess(object):
     def __init__(self, openid):
         self.openid = openid
@@ -263,6 +298,8 @@ class UserInfoProcess(object):
         return photo_uri
 
     def get_userinfo(self):
+        if not self.user:
+            return None
         return UserInfo.query.get(self.user.id)
 
     def get_details(self):
