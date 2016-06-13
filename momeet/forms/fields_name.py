@@ -22,6 +22,9 @@ class UserFields(object):
     AFFECTION = u'感情状况'
     INCOME = u'年收入'
 
+    JOB_LABEL = u'职业标签'
+    PERSONAL_LABEL = u'个人标签'
+
     GRADUATED = u'毕业院校'
     SPECIALTY = u'专业'
     EDUCATION = u'学历'

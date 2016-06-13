@@ -34,6 +34,11 @@ class Privilege(BaseModel):
     name = db.Column(db.String(50), default='')
 
 
+class Tag(BaseModel):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+
+
 class User(BaseModel, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     social_id = db.Column(db.String(100))  # openid
@@ -58,6 +63,9 @@ class User(BaseModel, UserMixin):
     work = db.relationship('WorkExperience', backref='user_work_experience', lazy='dynamic')
     photo = db.relationship('UserPhoto', backref='user_photo', lazy='dynamic')
 
+    job_label = db.Column(db.String(2000))
+    personal_label = db.Column(db.String(2000))
+
     industry = db.Column(db.SmallInteger, default=0)  # 行业
     income = db.Column(db.SmallInteger, default=0)  # 年收入
     affection = db.Column(db.SmallInteger, default=0)  # 感情状况
@@ -79,7 +87,8 @@ class User(BaseModel, UserMixin):
                             'birthday', 'age', 'height', 'location', 'affection',
                             'mobile_num', 'weixin_num', 'country', 'drink', 'smoke',
                             'hometown', 'constellation', 'religion', 'created',
-                            'social_id', 'wechat_union_id', 'id', 'industry', 'income']
+                            'social_id', 'wechat_union_id', 'id', 'industry', 'income',
+                            'job_label', 'personal_label']
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -92,10 +101,10 @@ class User(BaseModel, UserMixin):
 
     def to_dict_ext(self, columns=None):
         d = self.to_dict(columns=columns)
-        completeness = get_user_info_completeness(self.id)
+        completeness, msg = get_user_info_completeness(self.id)
         d['completeness'] = {
             'completeness': completeness,
-            'msg': u'完善资料开始约见吧' if completeness < 80 else u''
+            'msg': msg
         }
         d['birthday'] = d.get('birthday')[:10]
         d['work_expirence'] = map(lambda x: x.to_dict(), self.work.all())
@@ -206,32 +215,68 @@ def get_user_info(user_id):
 
 def get_user_info_completeness(user_id=None):
     complete = 0
+    msg = u''
     user = get_user(user_id)
     user_info = UserInfo.query.get(user.id)
     if not user:
-        return complete
+        return complete, msg
+
     user_dict = user.to_dict()
     user_info_dict = user_info.to_dict() if user_info else FancyDict()
-    statistics = ['avatar', 'real_name', 'gender', 'birthday',
-                  'height', 'mobile_num', 'weixin_num', 'location',
-                  'industry', 'income', 'affection', 'hometown',
-                  'constellation', 'edu', 'work', 'job_lable',
+    base_info = ['avatar', 'real_name', 'gender', 'birthday',
+                 'height', 'mobile_num', 'weixin_num', 'location']
+
+    ext_info = ['industry', 'income', 'affection', 'hometown',
+                'constellation']
+
+    other_info = ['edu', 'work', 'job_label',
                   'user_description', 'user_cover_photo',
                   'user_detail']
-    for _ in statistics:
-        if _ in user_dict.keys() and user_dict.get(_):
+
+    base_complete = len(filter(lambda _: _ in user_dict.keys() and user_dict.get(_), base_info))
+    ext_complete = len(filter(lambda _: _ in user_dict.keys() and user_dict.get(_), ext_info))
+
+    print filter(lambda _: _ in user_dict.keys() and user_dict.get(_), base_info)
+    print filter(lambda _: _ in user_dict.keys() and user_dict.get(_), ext_info)
+
+    job_label_flag = False
+    description_flag = False
+    detail_flag = False
+
+    for _ in other_info:
+        if _ == 'edu' and user.edu.all():
             complete += 1
-        elif _ == 'edu' and user.edu.all():
+        if _ == 'work' and user.work.all():
             complete += 1
-        elif _ == 'work' and user.work.all():
+        if _ == 'job_label':
+            if user_dict.get(_):
+                complete += 1
+                job_label_flag = True
+            else:
+                msg = u'职业标签还未编辑哦'
+        if _ == 'user_description':
+            if user_info_dict.description:
+                complete += 1
+                description_flag = True
+            else:
+                msg = u'编辑个人亮点后可上首页哦'
+        if _ == 'user_cover_photo' and user_info_dict.cover_photo:
             complete += 1
-        elif _ == 'user_description' and user_info_dict.description:
-            complete += 1
-        elif _ == 'user_cover_photo' and user_info_dict.cover_photo:
-            complete += 1
-        elif _ == 'user_detail' and user_info.detail.count():
-            complete += 1
-    return int(complete*100.0/len(statistics))
+        if _ == 'user_detail':
+            if user_info.detail.count() > 1:
+                complete += 1
+                detail_flag = True
+            else:
+                msg = u'完善更多介绍约见成功率更高哦'
+
+    if ext_complete <= 3:
+        msg = u'完善资料开始约见吧'
+    elif job_label_flag and description_flag and detail_flag:
+        msg = user.job_label
+
+    complete = int((complete + base_complete + ext_complete)*100.0/
+                   len(base_info + ext_info + other_info))
+    return complete, msg
 
 
 class UserProcess(object):

@@ -7,7 +7,7 @@ from momeet.constants.city import CITY_DATA
 from momeet.constants.user import *
 from momeet.forms.base import BaseForm
 from momeet.models.user import *
-from momeet.utils import safe_int, ClearElement, utf8
+from momeet.utils import safe_int
 from momeet.utils.upload import save_upload_file_to_qiniu, allowed_file
 from momeet.utils.view import (
     CustomRadioField as RadioField,
@@ -228,6 +228,8 @@ class UserBaseInfoUpdateForm(BaseForm):
     smoke = IntegerField(UserFields.SMOKE)
     constellation = IntegerField(UserFields.CONSTELLATION)
     religion = IntegerField(UserFields.RELIGION)
+    job_label = StringField(UserFields.JOB_LABEL)
+    personal_label = StringField(UserFields.PERSONAL_LABEL)
 
     def init_choices(self):
         field_dict = {}
@@ -387,8 +389,6 @@ class UserEduInfoForm(BaseForm):
             return process.add_edu_experience(d)
         elif method == 'update':
             return process.update_edu_experience(d, eid=int(eid))
-        # elif method == 'delete':
-        #     return process.delete_edu_experience(eid=eid)
         else:
             return None
 
