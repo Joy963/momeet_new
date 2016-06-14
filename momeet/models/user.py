@@ -4,7 +4,7 @@
 from datetime import datetime
 from flask_login import UserMixin
 from momeet.lib import BaseModel, db
-from momeet.utils import utf8
+from momeet.utils import utf8, Pagination
 from momeet.utils.common import FancyDict
 from sqlalchemy import or_
 
@@ -12,35 +12,22 @@ from sqlalchemy import or_
 USER_PER_PAGE_COUNT = 20
 
 
-class NoneUser(object):
-    """
-    """
-    username = ''
-
-    def __str__(self):
-        return 'none'
-
-    def __repr__(self):
-        return '<NonUser: none>'
-
-    def to_dict(self):
-        return dict(username=self.username)
-
-
-class Privilege(BaseModel):
-    """
-    用户微信特权
-    """
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), default='')
-
-
 def get_job_label_or_create(**kwargs):
     return JobLabel.query.filter_by(**kwargs).first() or JobLabel(**kwargs)
 
 
+def get_job_label_list_by_page(page=1, **kwargs):
+    labels = JobLabel.query.filter_by(**kwargs).paginate(page, USER_PER_PAGE_COUNT)
+    pagination = Pagination(page, USER_PER_PAGE_COUNT, labels.total)
+    return labels.items, pagination
+
+
 def get_personal_label_or_create(**kwargs):
     return PersonalLabel.query.filter_by(**kwargs).first() or PersonalLabel(**kwargs)
+
+
+def get_personal_label_list_by_page(page=1, user_id=None):
+    pass
 
 
 class JobLabel(BaseModel):

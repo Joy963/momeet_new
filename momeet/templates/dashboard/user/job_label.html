@@ -3,12 +3,14 @@
 {% from "page.html" import render_pagination %}
 {% from "dashboard/macro.html" import show_flash_messages %} 
 {% from "dashboard/macro.html" import form_submit %}
+{% from "dashboard/macro.html" import form_field %}
+{#{% from "dashboard/macro.html" import for %}#}
 
 
 <div class="container-fluid">
   <div class="row">
     <div class="col-lg-12">
-      <h1 class="page-header">邀请码管理</h1>
+      <h1 class="page-header">职业标签管理</h1>
     </div>
   </div>
 
@@ -18,13 +20,13 @@
     <div class="col-lg-12">
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h3 class="panel-title">生成邀请码</h3>
+          <h3 class="panel-title">新增标签</h3>
         </div>
         <div class="panel-body">
           <form class="form-horizontal group-border hover-stripped" role="form" method="post" id="form"
           action=''>
-{#            <input id="csrf_token" name="csrf_token" type="hidden" value="{{csrf_token()}}">#}
-            {{ form_submit() }} 
+              {{ form_field(job_form.text) }}
+            {{ form_submit() }}
           </form>
         </div>
       </div>
@@ -32,36 +34,19 @@
   </div>
 
   <div class="row">
-  </div>
-  <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">过滤</h3>
-            </div>
-            <div class="panel-body">
-                    <div class="form-group">
-                        <label class="col-lg-1 col-md-2 col-sm-12 control-label">是否使用</label>
-                        <div class="col-lg-10 col-md-10">
-                            <a href="{{url_for('dashboard.account.code',is_used=0)}}" class="btn btn-xs btn-success">未使用的</a>
-                            <a href="{{url_for('dashboard.account.code',is_used=1)}}" class="btn btn-xs btn-success">已使用的</a>
-                        </div>
-                    </div>
-            </div>
-        </div>
-
-  <div class="row">
     <div class="col-lg-12">
 
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h3 class="panel-title">邀请码列表</h3>
+          <h3 class="panel-title">TAG列表</h3>
         </div>
         <div class="panel-body">
           <table class="table table-bordered">
             <thead>
               <tr>
                 <th class="per10">ID</th>
-                <th class="per60">邀请码</th>
-                <th class="per30">是否使用</th>
+                <th class="per60">名称</th>
+                <th class="per30">所属用户</th>
               </tr>
             </thead>
 
@@ -69,15 +54,15 @@
               {% for item in items %}
               <tr>
                 <td>{{item.id}}</td>
-                <td>{{item.code}}</td>
-                <td>{{item.is_used}}</td>
+                <td>{{item.name}}</td>
+                <td>{{item.user_id}}</td>
               </tr>
               {% endfor %}
             </tbody>
           </table>
         </div>
       </div>
-      {{render_pagination(pagination)}}
+{#      {{render_pagination(pagination)}}#}
 
     </div>
   </div>

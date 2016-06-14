@@ -440,3 +440,19 @@ class UserSystemInfoForm(BaseForm):
 
 class UserSearchForm(BaseForm):
     text = StringField(u'用户搜索', [validators.required()])
+
+
+class UserJobLabelForm(BaseForm):
+    text = StringField(u'工作标签', [validators.required()])
+
+    def save(self):
+        job_label = get_job_label_or_create(name=self.text.data)
+        return job_label.save()
+
+
+class UserPersonalLabelForm(BaseForm):
+    text = StringField(u'个人标签', [validators.required()])
+
+    def save(self):
+        personal_label = get_personal_label_or_create(name=self.text.data)
+        return personal_label.save()

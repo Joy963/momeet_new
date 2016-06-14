@@ -6,24 +6,10 @@ from flask import (
     request, url_for, abort,
     redirect, jsonify
 )
-
-from momeet.constants.user import (
-    USER_GENDER_DESC,
-)
 from momeet.forms.engagement import EngagementForm
-from momeet.forms.user import (
-    UserForm, UserPhotoForm,
-    UserDetailForm,
-    UserDescriptionForm,
-    UserAuthForm,
-    UserCoverPhotoForm
-)
+from momeet.forms.user import *
 from momeet.models.engagement import UserEngagementProcess
-from momeet.models.user import (
-    get_user_list_by_page, USER_PER_PAGE_COUNT,
-    get_user, UserInfoProcess, get_user_info,
-    # UserInvitationProcess
-)
+from momeet.models.user import *
 from momeet.utils import logger
 from momeet.utils import safe_int, Pagination, flash
 from momeet.views.base import BaseView, FlagView
@@ -259,6 +245,32 @@ class UserAuthView(BaseView):
             return render_template(self.template_name, form=form)
 
 
+class JobLabelView(BaseView):
+    template_name = "dashboard/user/job_label.html"
+
+    def get(self):
+        page = safe_int(request.args.get("page", 1))
+        items, count = get_job_label_list_by_page(page=page)
+        pagination = Pagination(page, USER_PER_PAGE_COUNT, count)
+        job_form = UserJobLabelForm(csrf_enabled=False)
+        data = dict(
+            items=items,
+            pagination=pagination,
+            job_form=job_form
+        )
+        return render_template(self.template_name, **data)
+
+    def post(self):
+        job_form = UserJobLabelForm(csrf_enabled=False)
+        if job_form.validate_on_submit():
+            job_form.save()
+        return redirect(url_for('dashboard.user.job_label'))
+
+
+class PersonalLabelView(BaseView):
+    pass
+
+
 bp.add_url_rule("list/", view_func=UserListView.as_view("list"))
 bp.add_url_rule("create/", view_func=CreateUserView.as_view("create"))
 bp.add_url_rule("<int:res_id>/", view_func=UserView.as_view("item"))
@@ -270,3 +282,6 @@ bp.add_url_rule("<int:user_id>/cover/", view_func=UserCoverPhotoView.as_view("co
 bp.add_url_rule("<int:user_id>/description/", view_func=UserDescriptionView.as_view("description"))
 bp.add_url_rule("<int:user_id>/invitation/", view_func=UserEngagementView.as_view("invitation"))
 bp.add_url_rule("<int:user_id>/auth/", view_func=UserAuthView.as_view("auth"))
+
+bp.add_url_rule("job_label/", view_func=JobLabelView.as_view("job_label"))
+bp.add_url_rule("personal_label/<string:uid>", view_func=PersonalLabelView.as_view("personal_label"))
