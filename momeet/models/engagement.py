@@ -56,7 +56,8 @@ class Engagement(BaseModel):
 
 class UserEngagementProcess(object):
     def __init__(self, user_id):
-        self.user_id = user_id
+        self.user = get_user(user_id)
+        self.user_id = self.user.id
 
     def get_all_engagement(self):
         return Engagement.query.filter_by(
