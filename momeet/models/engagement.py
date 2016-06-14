@@ -51,6 +51,7 @@ class Engagement(BaseModel):
 
     @classmethod
     def get_engagement(cls, uid, **kwargs):
+        uid = get_user(uid).id
         return cls.query.filter_by(user_id=uid, is_active=True, **kwargs).order_by(cls.created.desc()).all()
 
 

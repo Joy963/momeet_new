@@ -33,6 +33,7 @@ class EngagementView(BaseView):
 
     def post(self, uid):
         _obj = UserEngagementProcess(uid).get_all_engagement_dict()
+        print _obj.user_id
         form = EngagementForm(csrf_enabled=False, obj=_obj)
         theme_data = request.form.get('theme', '').split(',')
         if form.is_submitted() and form.save(theme_data=theme_data):
