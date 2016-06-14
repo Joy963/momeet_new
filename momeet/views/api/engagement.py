@@ -34,7 +34,8 @@ class EngagementView(BaseView):
     def post(self, uid):
         _obj = UserEngagementProcess(uid).get_all_engagement_dict()
         form = EngagementForm(csrf_enabled=False, obj=_obj)
-        if form.validate_on_submit() and form.save():
+        theme = request.form.getlist('theme')
+        if form.validate_on_submit() and form.save(theme=theme):
             return jsonify({"success": True})
         return jsonify({"success": False})
 
@@ -43,7 +44,11 @@ class EngagementOrderView(BaseView):
     """
     邀约订单
     """
-    def get(self):
+    def get(self, oid=None):
+        if oid:
+            order = get_engagement_order(oid)
+            return jsonify({"success": True, "order": order.to_dict() if order else {}})
+
         status = safe_int(request.args.get("status", 0))
         host = safe_int(request.args.get("host", 0))
         guest = safe_int(request.args.get("guest", 0))
@@ -58,16 +63,99 @@ class EngagementOrderView(BaseView):
         return "End"
 
 
-class EngagementOrderStatus(BaseView):
-    def post(self, oid, action):
+class EngagementOrderStatusView(BaseView):
+    actions = ['confirm', 'deny', 'cancel', 'pay']
+
+    def post(self, oid):
+        try:
+            params = json.loads(request.data)
+        except ValueError:
+            params = {}
+
         order = get_engagement_order(oid)
-        if not order:
-            return jsonify({"success": False})
-        order.status = 2
-        return jsonify({"success": True})
+        user = get_user(params.get('user_id'))
+        action = params.get('action')
+        if not order or not user or not action:
+            return jsonify({"success": False, "msg": "invalid order_id or user_id"})
+        user_id = user.id
+
+        status_change_result = False
+        if action == 'confirm' and user_id == order.host:  # host确认
+            status_change_result = status_transition(order, 1, 4)
+
+        if action == 'deny' and user_id == order.host:  # host拒绝
+            status_change_result = status_transition(order, 1, 3)
+            if not status_change_result:
+                status_change_result = status_transition(order, 6, 9)
+                # TODO 退款
+
+        if action == 'cancel' and user_id == order.guest:  # guest取消
+            status_change_result = status_transition(order, 1, 2)
+            if not status_change_result:
+                status_change_result = status_transition(order, 6, 7)
+                # TODO 退款
+
+        if action == 'pay' and user_id == order.guest:  # guest支付
+            # TODO pay with alpay
+            status_change_result = status_transition(order, 4, 5)
+
+        if not status_change_result:
+            return jsonify({"success": status_change_result, "msg": "invalid status transition"})
+
+        order.save()
+        return jsonify({"success": True, "order": order.to_dict()})
+
+
+def status_transition(order, status_from, status_to):
+    if order.status == status_from:
+        order.status = status_to
+        order.save()
+        return True
+    else:
+        return False
+
+
+
+#
+# class EngagementOrderStatus(object):
+#     def __init__(self, order_id):
+#         self.obj = get_engagement_order(order_id)
+#
+#
+# class OrderGuestStartStatus(EngagementOrderStatus):
+#     def run(self):
+#         self.obj.status = 1
+#         self.obj.save()
+#
+#
+# class OrderHostConfirmStatus(EngagementOrderStatus):
+#     def host_apply(self):
+#         pass
+#
+#     def host_deny(self):
+#         pass
+#
+#     def guest_cancle(self):
+#         pass
+#
+#
+# class OrderGuestPayStatus(EngagementOrderStatus):
+#     pass
+#
+#
+# class OrderPayConfirmStatus(EngagementOrderStatus):
+#     pass
+#
+#
+# class OrderToMeetStatus(EngagementOrderStatus):
+#     pass
+#
+#
+# class OrderCompleteStatus(EngagementOrderStatus):
+#     pass
 
 
 bp.add_url_rule("list/<string:uid>/", view_func=EngagementView.as_view("list"))
-bp.add_url_rule("order/", view_func=EngagementOrderView.as_view("order"))
+bp.add_url_rule("order/<string:oid>", view_func=EngagementOrderView.as_view("order"))
 
-bp.add_url_rule("order/<string:oid>/<string:action>", view_func=EngagementOrderStatus.as_view("order.update"))
+bp.add_url_rule("order_action/<string:oid>", view_func=EngagementOrderStatusView.as_view("order.action"))

@@ -112,7 +112,7 @@ class EngagementOrder(BaseModel):
 
 
 def get_engagement_order(order_id):
-    return EngagementOrder.query.get(safe_int(order_id))
+    return EngagementOrder.query.get(order_id) if order_id else None
 
 
 def get_engagement_order_list(**kwargs):

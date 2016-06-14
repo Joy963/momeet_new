@@ -24,7 +24,10 @@ class EngagementForm(BaseForm):
         if self._obj and self._obj.theme:
             self.theme.checked_list = [int(_.theme) for _ in self._obj.theme]
 
-    def save(self):
+    def save(self, theme=None):
+        if not theme:
+            theme = self.theme.data
+
         uid = self._obj.user_id if self._obj and self._obj.user_id else None
 
         engagements = Engagement.get_engagement(uid)
@@ -36,7 +39,7 @@ class EngagementForm(BaseForm):
         for t in Theme.get_theme(engagement_id=engagement.id):
             t.delete()
 
-        for _ in self.theme.data:
+        for _ in theme:
             theme = Theme()
             theme.engagement_id = engagement.id
             theme.price = 50
