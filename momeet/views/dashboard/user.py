@@ -258,6 +258,7 @@ class JobLabelView(BaseView):
             pagination=pagination,
             job_form=job_form
         )
+        print items, pagination
         return render_template(self.template_name, **data)
 
     def post(self):

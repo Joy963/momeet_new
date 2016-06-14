@@ -34,8 +34,8 @@ class EngagementView(BaseView):
     def post(self, uid):
         _obj = UserEngagementProcess(uid).get_all_engagement_dict()
         form = EngagementForm(csrf_enabled=False, obj=_obj)
-        theme = request.form.getlist('theme')
-        if form.validate_on_submit() and form.save(theme=theme):
+        theme_data = request.form.get('theme', '').split(',')
+        if form.is_submitted() and form.save(theme_data=theme_data):
             return jsonify({"success": True})
         return jsonify({"success": False})
 
@@ -155,7 +155,7 @@ def status_transition(order, status_from, status_to):
 #     pass
 
 
-bp.add_url_rule("list/<string:uid>/", view_func=EngagementView.as_view("list"))
+bp.add_url_rule("list/<string:uid>", view_func=EngagementView.as_view("list"))
 bp.add_url_rule("order/<string:oid>", view_func=EngagementOrderView.as_view("order"))
 
 bp.add_url_rule("order_action/<string:oid>", view_func=EngagementOrderStatusView.as_view("order.action"))

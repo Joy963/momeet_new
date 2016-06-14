@@ -90,9 +90,9 @@ class UserEngagementProcess(object):
 
 
 class EngagementOrder(BaseModel):
-    dict_default_columns = ['id', 'host', 'guest', 'status', 'created', 'description', 'theme']
+    dict_default_columns = ['uuid', 'host', 'guest', 'status', 'created', 'description', 'theme']
 
-    id = db.Column(db.String(32), default=lambda : unicode(uuid4()).replace('-', '').upper(), primary_key=True)
+    uuid = db.Column(db.String(2), default=lambda : unicode(uuid4()).replace('-', '').upper(), primary_key=True)
     host = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     guest = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
@@ -112,13 +112,13 @@ class EngagementOrder(BaseModel):
 
 
 def get_engagement_order(order_id):
-    return EngagementOrder.query.get(order_id) if order_id else None
+    return EngagementOrder.query.get(safe_int(order_id))
 
 
 def get_engagement_order_list(**kwargs):
     kwargs = dict(map(lambda x: (x[0], get_user(x[1]).id) if x[0] in ['host', 'guest'] and get_user(x[1]) else x,
                       filter(lambda _: _[1], kwargs.items())))
-    return EngagementOrder.query.filter_by(**kwargs).order_by(EngagementOrder.id.desc())
+    return EngagementOrder.query.filter_by(**kwargs).order_by(EngagementOrder.uuid.desc())
 
 
 def get_engagement_order_list_by_page(page=1, **kwargs):

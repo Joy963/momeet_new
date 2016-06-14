@@ -23,7 +23,7 @@
           <table class="table table-bordered">
             <thead>
               <tr>
-                <th class="per10">ID</th>
+                <th class="per20">ID</th>
                 <th class="per60">Host</th>
                 <th class="per30">Guest</th>
                 <th class="per30">状态</th>
@@ -34,10 +34,10 @@
             <tbody>
               {% for item in items %}
               <tr>
-                <td><a href="{{url_for('dashboard.engagement.order',order_id=item.id)}}">{{item.id}}</a></td>
-                <td><a href="{{url_for('dashboard.engagement.orders',host=item.host)}}">{{item.host_name}}</a></td>
-                <td><a href="{{url_for('dashboard.engagement.orders',guest=item.guest)}}">{{item.guest_name}}</a></td>
-                <td><a href="{{url_for('dashboard.engagement.orders',status=item.status)}}">{{item.status_name}}</a></td>
+                <td><a href="{{url_for('dashboard.engagement.order', order_id=item.uuid)}}">{{item.uuid}}</a></td>
+                <td><a href="{{url_for('dashboard.engagement.orders', host=item.host)}}">{{item.host_name}}</a></td>
+                <td><a href="{{url_for('dashboard.engagement.orders', guest=item.guest)}}">{{item.guest_name}}</a></td>
+                <td><a href="{{url_for('dashboard.engagement.orders', status=item.status)}}">{{item.status_name}}</a></td>
                 <td>{{item.created}}</td>
               </tr>
               {% endfor %}
