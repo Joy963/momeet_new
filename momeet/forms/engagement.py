@@ -34,17 +34,26 @@ class EngagementForm(BaseForm):
         engagement = engagements[0] if engagements else Engagement()
         engagement.user_id = uid
         engagement.description = self.description.data
-        engagement.save()
 
         for t in Theme.get_theme(engagement_id=engagement.id):
             t.delete()
+
+        if not self.description.data or theme_data == ['']:
+            try:
+                engagement.delete()
+            except:
+                return True
+        else:
+            engagement.save()
+
         for _ in theme_data:
             theme = Theme()
             theme.engagement_id = engagement.id
             theme.price = 50
             theme.theme = _
             theme.save()
-        return engagement
+
+        return True
 
 
 class EngagementOrderForm(BaseForm):
