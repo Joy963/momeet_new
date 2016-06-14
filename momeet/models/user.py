@@ -35,9 +35,24 @@ class Privilege(BaseModel):
     name = db.Column(db.String(50), default='')
 
 
-class Tag(BaseModel):
+def get_job_label_or_create(**kwargs):
+    return JobLabel.query.filter_by(**kwargs).first() or JobLabel(**kwargs)
+
+
+def get_personal_label_or_create(**kwargs):
+    return PersonalLabel.query.filter_by(**kwargs).first() or PersonalLabel(**kwargs)
+
+
+class JobLabel(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
+    name = db.Column(db.String(100), unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+
+class PersonalLabel(BaseModel):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100),  unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 
 class User(BaseModel, UserMixin):
@@ -63,9 +78,8 @@ class User(BaseModel, UserMixin):
     edu = db.relationship('EduExperience', backref='user_edu_experience', lazy='dynamic')
     work = db.relationship('WorkExperience', backref='user_work_experience', lazy='dynamic')
     photo = db.relationship('UserPhoto', backref='user_photo', lazy='dynamic')
-
-    job_label = db.Column(db.String(2000))
-    personal_label = db.Column(db.String(2000))
+    job_label = db.relationship('JobLabel', backref='user_job_label', lazy='dynamic')
+    personal_label = db.relationship('PersonalLabel', backref='user_personal_label', lazy='dynamic')
 
     industry = db.Column(db.SmallInteger, default=0)  # 行业
     income = db.Column(db.SmallInteger, default=0)  # 年收入
@@ -88,8 +102,7 @@ class User(BaseModel, UserMixin):
                             'birthday', 'age', 'height', 'location', 'affection',
                             'mobile_num', 'weixin_num', 'country', 'drink', 'smoke',
                             'hometown', 'constellation', 'religion', 'created',
-                            'social_id', 'wechat_union_id', 'id', 'industry', 'income',
-                            'job_label', 'personal_label']
+                            'social_id', 'wechat_union_id', 'id', 'industry', 'income']
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -108,6 +121,8 @@ class User(BaseModel, UserMixin):
             'msg': msg,
             'next_page': next_page
         }
+        d['job_label'] = ','.join(map(lambda x: x.name, self.job_label.all()))
+        d['personal_label'] = ','.join(map(lambda x: x.name, self.personal_label.all()))
         d['birthday'] = d.get('birthday')[:10]
         d['work_expirence'] = map(lambda x: x.to_dict(), self.work.all())
         d['edu_expirence'] = map(lambda x: x.to_dict(), self.edu.all())
@@ -239,9 +254,6 @@ def get_user_info_completeness(user_id=None):
     base_complete = len(filter(lambda _: _ in user_dict.keys() and user_dict.get(_), base_info))
     ext_complete = len(filter(lambda _: _ in user_dict.keys() and user_dict.get(_), ext_info))
 
-    print filter(lambda _: _ in user_dict.keys() and user_dict.get(_), base_info)
-    print filter(lambda _: _ in user_dict.keys() and user_dict.get(_), ext_info)
-
     job_label_flag = False
     description_flag = False
     detail_flag = False
@@ -252,7 +264,7 @@ def get_user_info_completeness(user_id=None):
         if _ == 'work' and user.work.all():
             complete += 1
         if _ == 'job_label':
-            if user_dict.get(_):
+            if getattr(user, _).all():
                 complete += 1
                 job_label_flag = True
             else:
@@ -279,7 +291,7 @@ def get_user_info_completeness(user_id=None):
         msg = u'完善资料开始约见吧'
         next_page = 1
     elif job_label_flag and description_flag and detail_flag:
-        msg = user.job_label
+        msg = ','.join(map(lambda x: x.name, user.job_label.all()))
 
     complete = int((complete + base_complete + ext_complete)*100.0/
                    len(base_info + ext_info + other_info))
