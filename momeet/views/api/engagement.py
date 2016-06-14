@@ -46,7 +46,6 @@ class EngagementView(BaseView):
         engagement.description = description
 
         engagement_id = engagement.id if engagements else None
-        print engagement_id
         for t in Theme.get_theme(engagement_id=engagement_id):
             t.delete()
 
@@ -57,8 +56,7 @@ class EngagementView(BaseView):
                 return jsonify({"success": False})
         else:
             engagement.save()
-
-        for _ in theme_data:
+        for _ in theme_data.split(','):
             theme = Theme()
             theme.engagement_id = engagement.id
             theme.price = 50
