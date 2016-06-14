@@ -25,6 +25,7 @@ class EngagementForm(BaseForm):
             self.theme.checked_list = [int(_.theme) for _ in self._obj.theme]
 
     def save(self, theme_data=None):
+        # TODO bug 传入空值
         if not theme_data:
             theme_data = self.theme.data
 
@@ -42,7 +43,7 @@ class EngagementForm(BaseForm):
             try:
                 engagement.delete()
             except:
-                return True
+                return False
         else:
             engagement.save()
 
