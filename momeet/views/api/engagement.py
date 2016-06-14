@@ -3,6 +3,7 @@
 from flask import Blueprint, jsonify, request, json
 from momeet.views.base import BaseView
 from momeet.models.engagement import (
+    Theme,
     Engagement,
     EngagementOrder,
     UserEngagementProcess,
@@ -32,12 +33,38 @@ class EngagementView(BaseView):
         })
 
     def post(self, uid):
-        _obj = UserEngagementProcess(uid).get_all_engagement_dict()
-        form = EngagementForm(csrf_enabled=False, obj=_obj)
-        theme_data = request.form.get('theme', '').split(',')
-        if form.is_submitted() and form.save(theme_data=theme_data):
-            return jsonify({"success": True})
-        return jsonify({"success": False})
+        params = json.loads(request.data)
+        description = params.get('description')
+        theme_data = params.get('theme')
+        user = get_user(uid)
+        if not user:
+            return jsonify({"success": False})
+
+        engagements = Engagement.get_engagement(user.id)
+        engagement = engagements[0] if engagements else Engagement()
+        engagement.user_id = user.id
+        engagement.description = description
+
+        engagement_id = engagement.id if engagements else None
+        print engagement_id
+        for t in Theme.get_theme(engagement_id=engagement_id):
+            t.delete()
+
+        if not description or not theme_data:
+            try:
+                engagement.delete()
+            except:
+                return jsonify({"success": False})
+        else:
+            engagement.save()
+
+        for _ in theme_data:
+            theme = Theme()
+            theme.engagement_id = engagement.id
+            theme.price = 50
+            theme.theme = _
+            theme.save()
+        return jsonify({"success": True})
 
 
 class EngagementOrderView(BaseView):
