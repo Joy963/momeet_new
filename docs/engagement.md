@@ -1,5 +1,5 @@
 ## 邀约活动 
-### GET `/api/engagement/list/17/<string:uid>`
+### GET `/api/engagement/list/<string:uid>`
 >**response**
 ```json
 {
@@ -34,7 +34,7 @@
 ```
 
 
-### POST `/api/engagement/list/17/<string:uid>`
+### POST `/api/engagement/list/<string:uid>`
 ```json
 {
     description: "description...",
