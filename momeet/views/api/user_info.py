@@ -20,6 +20,7 @@ from momeet.forms.user import (
     UserDescriptionForm,
     UserDetailForm
 )
+from momeet.utils.qnutil import QiniuHelper
 
 bp = Blueprint('user_info', __name__)
 
@@ -181,6 +182,12 @@ class UserSystemInfoView(BaseView):
         return jsonify({"success": False, "msg": "ERROR"})
 
 
+class GetQiniuUploadToken(BaseView):
+    def get(self):
+        qn_heleper = QiniuHelper()
+        return jsonify({'token': qn_heleper.get_upload_token()})
+
+
 bp.add_url_rule("cover/<string:uid>", view_func=UserCoverPhotoView.as_view("cover"))
 bp.add_url_rule("description/<string:uid>", view_func=UserDescriptionView.as_view("description"))
 bp.add_url_rule("detail/<string:uid>", view_func=UserDetailView.as_view("detail"))
@@ -194,5 +201,7 @@ bp.add_url_rule("edu_info/<string:eid>", view_func=UserEduInfoView.as_view("edu_
 bp.add_url_rule("work_info", view_func=UserWorkInfoView.as_view("work_infos"))
 bp.add_url_rule("work_info/<string:wid>", view_func=UserWorkInfoView.as_view("work_info"))
 bp.add_url_rule("system_info/<string:uid>", view_func=UserSystemInfoView.as_view("system_info"))
+
+bp.add_url_rule("token", view_func=GetQiniuUploadToken.as_view("token"))
 
 
