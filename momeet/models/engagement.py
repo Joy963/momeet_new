@@ -131,19 +131,19 @@ def get_engagement_order_list_by_page(page=1, **kwargs):
 
 @listens_for(EngagementOrder, 'after_insert')
 def receive_after_insert(mapper, connection, target):
-    print target
+    pass
     # target.status = 1
     # target.save()
 
 
 @listens_for(EngagementOrder, 'after_update')
 def receive_after_update(mapper, connection, target):
-    print target, 'UPDATE'
+    pass
 
 
 @listens_for(EngagementOrder.status, 'set', named=True)
 def receive_set(**kw):
-    print kw
+    pass
 
 # class MyExtension(MapperExtension):
 #     def before_insert(self, mapper, connection, instance):

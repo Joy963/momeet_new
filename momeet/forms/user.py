@@ -280,7 +280,6 @@ class UserPhotoForm(BaseForm):
     def save(self, user_id):
         process = UserInfoProcess(user_id)
         _file = self.photo.data
-        print self.photo.data
         _photo = save_upload_file_to_qiniu(_file)
         photos = process.add_photo(_photo)
         return photos
@@ -459,7 +458,5 @@ class UserPersonalLabelForm(BaseForm):
                             blank_text=u'-- 请选择 --')
 
     def save(self):
-        print self.user.data
-        print type(self.user.data)
         personal_label = get_personal_label_or_create(name=self.text.data, user_id=self.user.data.id)
         return personal_label.save()
