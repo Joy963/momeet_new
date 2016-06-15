@@ -5,18 +5,16 @@ from enum import IntEnum
 
 
 class UserGender(IntEnum):
-    UNKNOWN = 0
-    WOMAN = 1
-    MAN = 2
+    MAN = 1
+    WOMAN = 2
 
     def describe(self):
-        return USER_GENDER_DESC.get(self.value, '')
+        return USER_GENDER_DESC.get(self.value, u'')
 
 
 USER_GENDER_DESC = {
     UserGender.WOMAN: u'女',
     UserGender.MAN: u'男',
-    UserGender.UNKNOWN: u'未知',
 }
 
 
@@ -29,7 +27,7 @@ class UserAffection(IntEnum):
     LOST_SPOUSE = 6
 
     def describe(self):
-        return USER_AFFECTION_DESC.get(self.value, '')
+        return USER_AFFECTION_DESC.get(self.value, u'')
 
 USER_AFFECTION_DESC = {
     UserAffection.SINGLE: u'单身并享受单身的状态',
@@ -50,7 +48,7 @@ class IncomeStatus(IntEnum):
     STATUS6 = 6
 
     def describe(self):
-        return INCOME_STATUS_DESC.get(self.value, '')
+        return INCOME_STATUS_DESC.get(self.value, u'')
 
 INCOME_STATUS_DESC = {
     IncomeStatus.STATUS1: u'10W以下',
@@ -70,22 +68,18 @@ class EducationStatus(IntEnum):
     STATUS5 = 5
     STATUS6 = 6
     STATUS7 = 7
-    STATUS8 = 8
-    STATUS9 = 9
 
     def describe(self):
-        return EDUCATION_STATUS_DESC.get(self.value, '')
+        return EDUCATION_STATUS_DESC.get(self.value, u'')
 
 EDUCATION_STATUS_DESC = {
-    EducationStatus.STATUS1: u'高中',
-    EducationStatus.STATUS2: u'技校',
-    EducationStatus.STATUS3: u'中专',
-    EducationStatus.STATUS4: u'大专',
-    EducationStatus.STATUS5: u'大学本科',
-    EducationStatus.STATUS6: u'硕士研究生',
-    EducationStatus.STATUS7: u'博士研究生',
-    EducationStatus.STATUS8: u'博士以上',
-    EducationStatus.STATUS9: u'其他',
+    EducationStatus.STATUS1: u'专科',
+    EducationStatus.STATUS2: u'本科',
+    EducationStatus.STATUS3: u'硕士',
+    EducationStatus.STATUS4: u'博士',
+    EducationStatus.STATUS5: u'博士后',
+    EducationStatus.STATUS6: u'MBA',
+    EducationStatus.STATUS7: u'其他',
 }
 
 
@@ -96,7 +90,7 @@ class DrinkStatus(IntEnum):
     STATUS4 = 4
 
     def describe(self):
-        return DRINK_STATUS_DESC.get(self.value, '')
+        return DRINK_STATUS_DESC.get(self.value, u'')
 
 
 DRINK_STATUS_DESC = {
@@ -114,7 +108,7 @@ class SmokeStatus(IntEnum):
     STATUS4 = 4
 
     def describe(self):
-        return SMOKE_STATUS_DESC.get(self.value, '')
+        return SMOKE_STATUS_DESC.get(self.value, u'')
 
 SMOKE_STATUS_DESC = {
     SmokeStatus.STATUS1: u'从不，比较反感',
@@ -134,7 +128,7 @@ class ReligionEnum(IntEnum):
     OTHER = 7
 
     def describe(self):
-        return RELIGION_DESC.get(self.value, '')
+        return RELIGION_DESC.get(self.value, u'')
 
 RELIGION_DESC = {
     ReligionEnum.NONE: u'无宗教信仰',
@@ -162,13 +156,13 @@ class ConstellationEnum(IntEnum):
     Sagittarius = 12
 
     def describe(self):
-        return CONSTELLATION_DESC.get(self.value, '')
+        return CONSTELLATION_DESC.get(self.value, u'')
 
 CONSTELLATION_DESC = {
     ConstellationEnum.Capricorn: u'魔羯座',
     ConstellationEnum.Aquarius: u'水瓶座',
     ConstellationEnum.Pisces: u'双鱼座',
-    ConstellationEnum.Aries: u'牡羊座',
+    ConstellationEnum.Aries: u'白羊座',
     ConstellationEnum.Taurus: u'金牛座',
     ConstellationEnum.Gemini: u'双子座',
     ConstellationEnum.Cancer: u'巨蟹座',
@@ -186,7 +180,7 @@ class AuthTypeEnum(IntEnum):
     TYPE3 = 3
 
     def describe(self):
-        return AUTH_TYPE_DESC.get(self.value, '')
+        return AUTH_TYPE_DESC.get(self.value, u'')
 
 AUTH_TYPE_DESC = {
     AuthTypeEnum.TYPE1: u'职业身份认证',
@@ -207,7 +201,7 @@ class InvitationTypeEnum(IntEnum):
     TYPE9 = 9
 
     def describe(self):
-        return INVITATION_TYPE_DESC.get(self.value, '')
+        return INVITATION_TYPE_DESC.get(self.value, u'')
 
 INVITATION_TYPE_DESC = {
     InvitationTypeEnum.TYPE1: u'吃饭、聚餐',
@@ -219,4 +213,152 @@ INVITATION_TYPE_DESC = {
     InvitationTypeEnum.TYPE7: u'看电影',
     InvitationTypeEnum.TYPE8: u'演唱会、话剧、展览等演出',
     InvitationTypeEnum.TYPE9: u'其他',
+}
+
+
+class IndustryTypeEnum(IntEnum):
+    TYPE1 = 1
+    TYPE2 = 2
+    TYPE3 = 3
+    TYPE4 = 4
+    TYPE5 = 5
+    TYPE6 = 6
+    TYPE7 = 7
+    TYPE8 = 8
+    TYPE9 = 9
+    TYPE10 = 10
+    TYPE11 = 11
+    TYPE12 = 12
+    TYPE13 = 13
+    TYPE14 = 14
+    TYPE15 = 15
+    TYPE16 = 16
+    TYPE17 = 17
+    TYPE18 = 18
+    TYPE19 = 19
+    TYPE20 = 20
+    TYPE21 = 21
+
+    def describe(self):
+        return INDUSTRY_TYPE_DESC.get(self.value, u'')
+
+INDUSTRY_TYPE_DESC = {
+    IndustryTypeEnum.TYPE1: u'互联网/软件',
+    IndustryTypeEnum.TYPE2: u'金融',
+    IndustryTypeEnum.TYPE3: u'重工制造',
+    IndustryTypeEnum.TYPE4: u'法律/会计/咨询',
+    IndustryTypeEnum.TYPE5: u'贸易',
+    IndustryTypeEnum.TYPE6: u'房产建筑',
+    IndustryTypeEnum.TYPE7: u'学生',
+    IndustryTypeEnum.TYPE8: u'文化/传媒',
+    IndustryTypeEnum.TYPE9: u'电子/硬件',
+    IndustryTypeEnum.TYPE10: u'轻工制造',
+    IndustryTypeEnum.TYPE11: u'教育科研',
+    IndustryTypeEnum.TYPE12: u'零售',
+    IndustryTypeEnum.TYPE13: u'能源环保水利',
+    IndustryTypeEnum.TYPE14: u'酒店旅游',
+    IndustryTypeEnum.TYPE15: u'制药/生物科技',
+    IndustryTypeEnum.TYPE16: u'医疗',
+    IndustryTypeEnum.TYPE17: u'生活服务',
+    IndustryTypeEnum.TYPE18: u'交通运输',
+    IndustryTypeEnum.TYPE19: u'电信',
+    IndustryTypeEnum.TYPE20: u'政府/社会组织',
+    IndustryTypeEnum.TYPE21: u'农林牧渔',
+}
+
+
+class EngagementStatusEnum(IntEnum):
+    TYPE1 = 1
+    TYPE2 = 2
+    TYPE3 = 3
+    TYPE4 = 4
+    TYPE5 = 5
+    TYPE6 = 6
+    TYPE7 = 7
+    TYPE8 = 8
+    TYPE9 = 9
+    TYPE10 = 10
+    TYPE11 = 11
+
+    def describe(self, role):
+        return ENGAGEMENT_STATUS_DESC.get(self.value, {}).get(role, u'')
+
+ENGAGEMENT_STATUS_DESC = {
+    EngagementStatusEnum.TYPE1: {
+        u'guest_list': u'待对方确认',
+        u'guest': u'待对方确认',
+        u'host_list': u'接受/拒绝约见',
+        u'host': u'待确认',
+        u'system': u'待host确认'
+    },
+    EngagementStatusEnum.TYPE2: {
+        u'guest_list': u'已取消',
+        u'guest': u'已取消',
+        u'host_list': u'对方已取消',
+        u'host': u'对方已取消',
+        u'system': u'guest已取消'
+    },
+    EngagementStatusEnum.TYPE3: {
+        u'guest_list': u'预约未接受',
+        u'guest': u'预约未接受',
+        u'host_list': u'已关闭',
+        u'host': u'已关闭',
+        u'system': u'host已拒绝'
+    },
+    EngagementStatusEnum.TYPE4: {
+        u'guest_list': u'待支付',
+        u'guest': u'待支付',
+        u'host_list': u'待对方付款',
+        u'host': u'待对方付款',
+        u'system': u'待guest付款'
+    },
+    EngagementStatusEnum.TYPE5: {
+        u'guest_list': u'待见面',
+        u'guest': u'待见面',
+        u'host_list': u'待对方付款',
+        u'host': u'待对方付款',
+        u'system': u'待支付平台确认'
+    },
+    EngagementStatusEnum.TYPE6: {
+        u'guest_list': u'待见面',
+        u'guest': u'待双方见面',
+        u'host_list': u'待见面',
+        u'host': u'待双方见面',
+        u'system': u'待双方见面'
+    },
+    EngagementStatusEnum.TYPE7: {
+        u'guest_list': u'待退款',
+        u'guest': u'待退款',
+        u'host_list': u'对方已取消',
+        u'host': u'对方已取消',
+        u'system': u'guest约见后取消'
+    },
+    EngagementStatusEnum.TYPE8: {
+        u'guest_list': u'已关闭',
+        u'guest': u'已关闭',
+        u'host_list': u'对方已取消',
+        u'host': u'对方已取消',
+        u'system': u'guest取消已退款'
+    },
+    EngagementStatusEnum.TYPE9: {
+        u'guest_list': u'待退款',
+        u'guest': u'对方已取消，待退款',
+        u'host_list': u'已取消',
+        u'host': u'已取消',
+        u'system': u'host约见后取消'
+    },
+    EngagementStatusEnum.TYPE10: {
+        u'guest_list': u'已退款',
+        u'guest': u'已退款',
+        u'host_list': u'已取消',
+        u'host': u'已取消',
+        u'system': u'host取消已退款'
+    },
+    EngagementStatusEnum.TYPE11: {
+        u'guest_list': u'已完成',
+        u'guest': u'已完成',
+        u'host_list': u'已完成',
+        u'host': u'已完成',
+        u'system': u'约见已完成'
+    }
 }

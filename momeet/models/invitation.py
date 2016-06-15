@@ -29,9 +29,9 @@ def get_invitation_code_list_by_page(page=1, is_used=False):
 
 
 def create_invitation_code():
-    code = get_random_string(7)
+    code = get_random_string(4)
     while InvitationCode.query.filter_by(code=code).first():
-        code = get_random_string(7)
+        code = get_random_string(4)
 
     invitation_code = InvitationCode()
     invitation_code.code = code

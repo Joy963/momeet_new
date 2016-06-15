@@ -22,6 +22,9 @@ class UserFields(object):
     AFFECTION = u'感情状况'
     INCOME = u'年收入'
 
+    JOB_LABEL = u'职业标签'
+    PERSONAL_LABEL = u'个人标签'
+
     GRADUATED = u'毕业院校'
     SPECIALTY = u'专业'
     EDUCATION = u'学历'
@@ -34,12 +37,20 @@ class UserFields(object):
     ID_CARD = u'身份证'
 
     PHOTO = u'照片'
-    DESCRIPTION = u'自我描述'
+    COVER_PHOTO = u'封面照'
+    DESCRIPTION = u'个人亮点'
     DETAIL = u'详细描述'
+    DETAIL_TYPE = u'分类'
+    DETAIL_CONTENT = u'内容'
+    DETAIL_PHOTO = u'照片'
 
     INVITATION_DESC = u'邀约描述'
     INVITATION_TYPE = u'邀约类型'
     INVITATION_PRICE = u'邀约价格'
 
+    INVITATION_HOST = u'约见接收'
+    INVITATION_GUEST = u'约见发起'
+
     AUTH_TYPE = u'认证类型'
+
 

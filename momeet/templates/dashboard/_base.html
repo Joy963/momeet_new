@@ -30,7 +30,10 @@
           <div class="navbar-header">
             <a class="navbar-brand" href="/">Momeet dashboard</a>
           </div>
-    
+        <div class="navbar-btn">
+            {% block user_search %}
+            {% endblock %}
+        </div>
           <ul class="nav navbar-top-links navbar-right">
             <li class="dropdown">
               <a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -55,13 +58,6 @@
                 </li>
 
                 <li>
-                  <a href="{{url_for('dashboard.industry')}}">
-                      <i class="fa fa-bar-chart-o fa-fw"></i>
-                      行业管理
-                  </a>
-                </li>
-
-                <li>
                   <a href="{{url_for('dashboard.user.list')}}">
                       <i class="fa fa-bar-chart-o fa-fw"></i>
                       用户管理
@@ -74,11 +70,23 @@
                       添加新用户
                   </a>
                 </li>
-
+                  <li>
+                  <a href="{{url_for('dashboard.user.personal_label')}}">
+                      <i class="fa fa-bar-chart-o fa-fw"></i>
+                      个人标签管理
+                  </a>
+                </li>
                 <li>
                   <a href="{{url_for('dashboard.account.code')}}">
                       <i class="fa fa-bar-chart-o fa-fw"></i>
                       邀请码管理
+                  </a>
+                </li>
+
+                <li>
+                  <a href="{{url_for('dashboard.engagement.orders')}}">
+                      <i class="fa fa-bar-chart-o fa-fw"></i>
+                      订单管理
                   </a>
                 </li>
               </ul>

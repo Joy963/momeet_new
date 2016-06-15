@@ -1,0 +1,70 @@
+{% extends "dashboard/_base.html" %}
+{% block content %}
+{% from "page.html" import render_pagination %}
+{% from "dashboard/macro.html" import show_flash_messages %} 
+{% from "dashboard/macro.html" import form_submit %}
+{% from "dashboard/macro.html" import form_field %}
+{% from "dashboard/macro.html" import form_select %}
+
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-lg-12">
+      <h1 class="page-header">个人标签管理</h1>
+    </div>
+  </div>
+
+  {{show_flash_messages()}}
+
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">新增标签</h3>
+        </div>
+        <div class="panel-body">
+          <form class="form-horizontal group-border hover-stripped" role="form" method="post" id="form"
+          action=''>
+              {{ form_field(personal_form.text) }}
+              {{ form_select(personal_form.user) }}
+            {{ form_submit() }}
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-12">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">TAG列表</h3>
+        </div>
+        <div class="panel-body">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th class="per10">ID</th>
+                <th class="per60">名称</th>
+                <th class="per30">所属用户</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for item in items %}
+              <tr>
+                <td>{{item.id}}</td>
+                <td>{{item.name}}</td>
+                <td>{{item.user_id}}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

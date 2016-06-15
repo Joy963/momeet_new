@@ -13,6 +13,7 @@ def register_routes(app, url_prefix='/api/'):
     app.register_blueprint(invitation_bp, url_prefix=url_prefix + 'invitation/')
     app.register_blueprint(user_bp, url_prefix=url_prefix + 'user/')
     app.register_blueprint(engagement_bp, url_prefix=url_prefix + 'engagement/')
+    return app
 
 
 def before_request(app):

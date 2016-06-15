@@ -8,7 +8,7 @@ from sqlalchemy.exc import InternalError
 from momeet.utils.log import enable_logging
 from momeet.config import c
 from momeet.lib import (
-    db, rdb, lm,
+    db, rdb, lm, FiniteStateMachine,
     RedisSessionInterface
 )
 from momeet.views import *

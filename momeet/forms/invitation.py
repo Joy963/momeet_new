@@ -4,6 +4,7 @@
 from wtforms import StringField, validators
 from momeet.forms.base import BaseForm
 from momeet.models.invitation import InvitationCode
+from momeet.utils.error import ErrorsEnum
 
 
 class InvitationCodeForm(BaseForm):
@@ -14,5 +15,9 @@ class InvitationCodeForm(BaseForm):
 
     def code_check(self):
         code = InvitationCode.query.filter_by(code=self.code.data).first()
-        return not code.is_used if code else False
+        if not code or code and code.code != self.code.data:
+            return False, ErrorsEnum.INVITATION_CODE_NON_EXIST.describe(), u"请输入正确有效的邀请码"
+        if code and code.is_used:
+            return False, ErrorsEnum.INVITATION_CODE_INVALID.describe(), u"请输入正确有效的邀请码"
+        return True, u"OK", u"OK"
 

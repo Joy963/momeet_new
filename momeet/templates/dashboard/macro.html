@@ -24,6 +24,32 @@
   </div>
 {% endmacro %}
 
+{% macro form_search(field, display_label=True, hide_field=False) %}
+  <div class="form-group {% if field.errors %}has-error{% endif %}" style="display: {{ 'none;' if hide_field else 'block;' }}">
+
+    {% if display_label %}
+      {{ field.label(class_='col-lg-1 col-md-2 col-sm-12 control-label') }}
+    {% endif %}
+
+    {% if field.description %}
+        <div class="col-lg-3 col-md-10">
+            {{ field(class_='form-control', placeholder=field.description) }}
+            {% if field.errors %}
+                <label for="" class="help-block">{{ field.errors[0] }}</label>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="col-lg-5 col-md-10">
+            {{ field(class_='form-control') }}
+            {% if field.errors %}
+                <label for="" class="help-block">{{ field.errors[0] }}</label>
+            {% endif %}
+        </div>
+    {% endif %}
+
+  </div>
+{% endmacro %}
+
 {% macro form_submit() %}
 <div class="form-group">
     <label class="col-lg-1 col-md-2 col-sm-12 control-label"></label>

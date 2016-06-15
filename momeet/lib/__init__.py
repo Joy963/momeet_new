@@ -7,3 +7,4 @@ from .redisdb import rdb
 from .lm import lm
 from .auth import auth
 from .session import RedisSessionInterface
+from .fsm import FiniteStateMachine

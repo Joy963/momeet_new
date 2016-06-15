@@ -89,12 +89,12 @@ class BaseModel(DefaultModel, SessionMixin):
         if columns is None:
             columns = self.dict_default_columns
         for col in columns:
-            if col == 'id' or col in getattr(self, 'encrypt_attrs', []):
-                value = id_encrypt(getattr(self, col))
+            if col == 'id' or col == 'user_id' or col in getattr(self, 'encrypt_attrs', []):
+                value = getattr(self, col)
             else:
                 value = getattr(self, col)
             if isinstance(value, datetime.datetime):
-                value = value.strftime('%Y-%m-%d')
+                value = value.strftime('%Y-%m-%d %H:%M:%S')
             if isinstance(value, BaseModel):
                 value = value.to_dict()
             if value is None:

@@ -8,10 +8,12 @@ from flask import (
 )
 
 from flask.views import View
+from momeet.models.engagement import Engagement, Theme
+from momeet.models.user import EduExperience, WorkExperience, UserPhoto
 
 
 class BaseView(View):
-    methods = ['GET', 'POST']
+    methods = ['GET', 'POST', 'PUT', 'DELETE']
 
     def dispatch_request(self, *args, **kwargs):
         request_method = request.method
@@ -24,9 +26,15 @@ class BaseView(View):
     def post(self, *args, **kwargs):
         abort(405)
 
+    def put(self, *args, **kwargs):
+        abort(405)
+
+    def delete(self, *args, **kwargs):
+        abort(405)
+
 
 class FlagView(BaseView):
-    MODIFY_IS_ACTIVE = False  # 如果为 true 只改变 is_active 的值 否则 delete 掉
+    MODIFY_IS_ACTIVE = True  # 如果为 true 只改变 is_active 的值 否则 delete 掉
     REDIRECT = False
     SAVE_RES = True
 
@@ -84,6 +92,14 @@ class FlagView(BaseView):
                 res.is_active = False
                 res.save()
             else:
+                WorkExperience.query.filter_by(user_id=res_id).delete()
+                EduExperience.query.filter_by(user_id=res_id).delete()
+                UserPhoto.query.filter_by(user_id=res_id).delete()
+
+                engagements = Engagement.query.filter_by(user_id=res_id).all()
+                for _ in engagements:
+                    Theme.query.filter_by(engagement_id=_.id).delete()
+                    _.delete()
                 res.delete()
             self.exec_method('after_delete', res)
         return jsonify(checked)

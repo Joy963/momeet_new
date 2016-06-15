@@ -6,6 +6,7 @@
 {% block content %}
 {% from "dashboard/macro.html" import form_textarea %}
 {% from "dashboard/macro.html" import form_submit %}
+{% from "dashboard/macro.html" import form_filefield %}
 {% from "dashboard/macro.html" import show_flash_messages %} 
 
 <div class="container-fluid">
@@ -26,46 +27,114 @@
       <div class="panel panel-default">
         <div class="panel-heading">
         </div>
+
+          <div class="panel-body">
+
+          <form class="form-horizontal group-border hover-stripped" role="form" method="post" id="user_form"
+                action='{{ url_for('dashboard.user.description', user_id=user.id) }}'>
+            {{ form_dsp.csrf_token }}
+            {{ form_textarea(form_dsp.description) }}
+            {{ form_submit() }}
+          </form>
+        </div>
+
         <div class="panel-body">
           <form class="form-horizontal group-border hover-stripped" role="form" method="post" id="user_form"
-              action='' >
-            {{ form.csrf_token }} 
-            {{ form_textarea(form.description) }} 
-            {{ form_textarea(form.detail) }}
-            {{ form_submit() }} 
+                action='{{ url_for('dashboard.user.cover', user_id=user.id) }}'
+                enctype="multipart/form-data" accept="image/*">
+            {{ form_dsp.csrf_token }}
+            {{ form_filefield(form_cover.photo) }}
+            {{ form_submit() }}
           </form>
         </div>
       </div>
+
+
+      <div class="panel panel-default">
+          <div class="panel-body">
+              <label>个人详情</label>
+            <form class="form-horizontal group-border hover-stripped" role="form" method="post" id="user_form"
+                  action='{{ url_for('dashboard.user.detail', user_id=user.id) }}'
+                  enctype="multipart/form-data" accept="image/*">
+            {{ form_dtl.csrf_token }}
+            {{ form_textarea(form_dtl.title) }}
+            {{ form_textarea(form_dtl.content) }}
+            {{ form_filefield(form_dtl.photo) }}
+            {{ form_submit() }}
+          </form>
+        </div>
+        </div>
+
+        <div class="row">
+    <div class="col-lg-12">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">详情列表</h3>
+        </div>
+        <div class="panel-body">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th class="per10">ID</th>
+                <th class="per10">标题</th>
+                <th class="per20">内容</th>
+                <th class="per60">照片</th>
+              </tr>
+            </thead>
+            <tbody url="{{url_for('dashboard.user.detail.delete',user_id=user.id)}}">
+              {% for detail in user_details %}
+              <tr>
+                <td>{{ detail.id }}</td>
+                <td>{{ detail.title }}</td>
+                <td>{{ detail.content[:40] }}</td>
+                <td>
+                {% if detail.photo %}
+                    {% for p in detail.photo.split(',') %}
+                    <a href="{{ p }}"><img src="{{p}}" style="width: 60px;height: 60px;margin: auto;border-radius: 2px;"></a>
+                    {% endfor %}
+                {% endif %}
+                <button type="button" class="btn btn-xs btn-danger btn-del">删除</button></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
     </div>
   </div>
 
 </div>
 {% endblock %}
-{% block js %}
-  <script type="application/javascript" src="{{ static_file('dashboard/js/summernote/summernote.js') }}"></script>
-  <script type="application/javascript" src="{{ static_file('dashboard/js/summernote/upload.js') }}"></script>
-  <script type="application/javascript" src="{{ static_file('dashboard/js/summernote/plugin.js') }}"></script>
-  
-<script type="text/javascript" charset="utf-8">
-        $(document).ready(function() {
-            $('#detail').summernote({
-                toolbar: [
-                    ['insert', ['picture']],
-                    ['insert', ['titledesc','clear_titledesc']],
-                    ['view', ['codeview','fullscreen']],
-                ],
-                height:600,
-                width:1000,
-                lang: 'zh-CN',
-                onImageUpload: function(files, editor, welEditable) {
-                    $.each(files, function (idx, file) {
-                        sendFile(file,editor,welEditable);
-                    });
-                }
-            });
 
+{% block js %}
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function() {
+    $('.btn-del').click(function() {
+      var _this = $(this);
+      var url = _this.parent().parent().parent().attr("url");
+      var detail_id = _this.parent().parent().find("td").first().text();
+      console.log(url);
+      console.log(detail_id);
+      var data = {
+        'detail_id': detail_id
+      };
+      if (confirm("确定删除么!")) {
+        $.ajax({
+          type: "POST",
+          url: url,
+          data:data,
+          success: function(json) {
+            location.reload();
+          },
+          dataType: 'json'
         });
-    
+      }
+    })
+  });
 </script>
 {% endblock %}
 

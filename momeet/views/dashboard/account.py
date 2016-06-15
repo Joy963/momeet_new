@@ -8,14 +8,13 @@ from flask import (
     redirect
 )
 
-from ._base import BaseView
-
-from momeet.utils import safe_int, Pagination, flash
 from momeet.models.invitation import (
     get_invitation_code_list_by_page,
     PER_PAGE_COUNT,
     create_invitation_code
 )
+from momeet.utils import safe_int, Pagination
+from momeet.views.base import BaseView
 
 bp = Blueprint('dashboard.account', __name__)
 
