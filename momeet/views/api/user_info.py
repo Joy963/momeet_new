@@ -4,6 +4,7 @@ from flask import Blueprint, jsonify, request
 from momeet.views.base import BaseView
 from momeet.models.user import (
     get_user,
+    get_user_list_limit,
     get_user_info,
     EduExperience,
     WorkExperience,
@@ -21,6 +22,7 @@ from momeet.forms.user import (
     UserDetailForm
 )
 from momeet.utils.qnutil import QiniuHelper
+from momeet.utils import safe_int, Pagination
 
 bp = Blueprint('user_info', __name__)
 
@@ -188,6 +190,17 @@ class GetQiniuUploadToken(BaseView):
         return jsonify({'token': qn_heleper.get_upload_token()})
 
 
+class IndexUserListView(BaseView):
+    def get(self):
+        users = get_user_list_limit()
+        return jsonify({"success": True, "results": map(lambda _: _.to_dict_index(), users)})
+
+
+class IndexUserInfoView(BaseView):
+    def get(self):
+        return "GET INFO"
+
+
 bp.add_url_rule("cover/<string:uid>", view_func=UserCoverPhotoView.as_view("cover"))
 bp.add_url_rule("description/<string:uid>", view_func=UserDescriptionView.as_view("description"))
 bp.add_url_rule("detail/<string:uid>", view_func=UserDetailView.as_view("detail"))
@@ -203,5 +216,8 @@ bp.add_url_rule("work_info/<string:wid>", view_func=UserWorkInfoView.as_view("wo
 bp.add_url_rule("system_info/<string:uid>", view_func=UserSystemInfoView.as_view("system_info"))
 
 bp.add_url_rule("upload_token", view_func=GetQiniuUploadToken.as_view("upload_token"))
+
+bp.add_url_rule("user_list", view_func=IndexUserListView.as_view("user_list"))
+bp.add_url_rule("user_info", view_func=IndexUserInfoView.as_view("user_info"))
 
 

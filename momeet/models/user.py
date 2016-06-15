@@ -63,6 +63,9 @@ class User(BaseModel, UserMixin):
     country = db.Column(db.String(20))  # 国家
     location = db.Column(db.String(100), default='0,0')  # 所在城市
 
+    longtitude = db.Column(db.Float)    # 经度
+    laititude = db.Column(db.Float)  # 纬度
+
     engagement = db.relationship('Engagement', backref='user_engagement', lazy='dynamic')
     edu = db.relationship('EduExperience', backref='user_edu_experience', lazy='dynamic')
     work = db.relationship('WorkExperience', backref='user_work_experience', lazy='dynamic')
@@ -115,6 +118,15 @@ class User(BaseModel, UserMixin):
         d['birthday'] = d.get('birthday')[:10]
         d['work_expirence'] = map(lambda x: x.to_dict(), self.work.all())
         d['edu_expirence'] = map(lambda x: x.to_dict(), self.edu.all())
+        return d
+
+    def to_dict_index(self):
+        columns = ['real_name', 'gender', 'longtitude', 'laititude']
+        d = self.to_dict(columns=columns)
+        d['job_label'] = ','.join(map(lambda x: x.name, self.job_label.all()))
+        d['personal_label'] = ','.join(map(lambda x: x.name, self.personal_label.all()))
+        user_info = UserInfo.query.get(self.id)
+        d['cover_photo'] = user_info.cover_photo
         return d
 
 
@@ -211,6 +223,12 @@ def get_user_list_by_page(page=1, **kwargs):
         .filter_by(is_active=True)
     users = users.order_by(User.id.desc()).paginate(page, USER_PER_PAGE_COUNT)
     return users.items, users.total
+
+
+def get_user_list_limit(limit=20, **kwargs):
+    users = User.query.filter(or_(getattr(User, k) == v for k, v in kwargs.items())) \
+        .filter_by(is_active=True)
+    return users.order_by(User.id.desc()).limit(limit=limit).all()
 
 
 def get_user_info(user_id):
