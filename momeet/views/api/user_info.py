@@ -197,13 +197,14 @@ class IndexUserListView(BaseView):
         laititude = request.args.get('laititude')
         user_id = request.args.get('user_id')
         page = request.args.get('page', 1)
-        users = get_user_list_limit(page=page)
+        users = get_user_list_limit(page=safe_int(page))
 
         return jsonify({"success": True, "results": map(lambda _: _.to_dict_index(), users)})
 
 
 class IndexUserInfoView(BaseView):
     def get(self):
+        user_id = request.args.get('user_id')
         return "GET INFO"
 
 
