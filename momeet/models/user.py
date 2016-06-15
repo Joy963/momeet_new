@@ -97,10 +97,10 @@ class User(BaseModel, UserMixin):
         super(User, self).__init__(**kwargs)
 
     def __str__(self):
-        return utf8(self.user_name)
+        return unicode(self.user_name)
 
     def __repr__(self):
-        return utf8('<User: %s>' % self.user_name)
+        return unicode('<User: %s>' % self.user_name)
 
     def to_dict_ext(self, columns=None):
         d = self.to_dict(columns=columns)
