@@ -202,6 +202,6 @@ bp.add_url_rule("work_info", view_func=UserWorkInfoView.as_view("work_infos"))
 bp.add_url_rule("work_info/<string:wid>", view_func=UserWorkInfoView.as_view("work_info"))
 bp.add_url_rule("system_info/<string:uid>", view_func=UserSystemInfoView.as_view("system_info"))
 
-bp.add_url_rule("token", view_func=GetQiniuUploadToken.as_view("token"))
+bp.add_url_rule("upload_token", view_func=GetQiniuUploadToken.as_view("upload_token"))
 
 
