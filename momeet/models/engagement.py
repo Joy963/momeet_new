@@ -144,9 +144,3 @@ def receive_after_update(mapper, connection, target):
 @listens_for(EngagementOrder.status, 'set', named=True)
 def receive_set(**kw):
     pass
-
-# class MyExtension(MapperExtension):
-#     def before_insert(self, mapper, connection, instance):
-#         print "instance %s before insert !" % instance
-#
-# m = mapper(User, users_table, extension=MyExtension())
