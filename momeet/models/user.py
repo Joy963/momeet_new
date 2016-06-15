@@ -12,14 +12,14 @@ from sqlalchemy import or_
 USER_PER_PAGE_COUNT = 20
 
 
-# def get_job_label_or_create(**kwargs):
-#     return JobLabel.query.filter_by(**kwargs).first() or JobLabel(**kwargs)
+def get_job_label_or_create(**kwargs):
+    return JobLabel.query.filter_by(**kwargs).first() or JobLabel(**kwargs)
 
 
-# def get_job_label_list_by_page(page=1, **kwargs):
-#     labels = JobLabel.query.filter_by(**kwargs).paginate(page, USER_PER_PAGE_COUNT)
-#     pagination = Pagination(page, USER_PER_PAGE_COUNT, labels.total)
-#     return labels.items, pagination
+def get_job_label_list_by_page(page=1, **kwargs):
+    labels = JobLabel.query.filter_by(**kwargs).paginate(page, USER_PER_PAGE_COUNT)
+    pagination = Pagination(page, USER_PER_PAGE_COUNT, labels.total)
+    return labels.items, pagination
 
 
 def get_personal_label_or_create(**kwargs):
