@@ -19,8 +19,6 @@ class EngagementOrderView(BaseView):
             items, pagination = get_engagement_order_list_by_page(
                 page=page, status=status, host=host, guest=guest)
             data = dict(items=map(lambda x: x.to_dict_ext(), items), pagination=pagination)
-            print items
-            print pagination
             return render_template(self.template_name, **data)
         else:
             item = get_engagement_order(order_id)
