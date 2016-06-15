@@ -197,22 +197,22 @@ class UserEngagementView(BaseView):
     def get(self, user_id):
         user = get_user(user_id)
         _obj = UserEngagementProcess(user_id).get_all_engagement_dict()
-        form = EngagementForm(obj=_obj)
+        e_form = EngagementForm(obj=_obj)
         return render_template(
             self.template_name,
-            form=form,
+            form=e_form,
             user=user)
 
     def post(self, user_id):
         user = get_user(user_id)
         _obj = UserEngagementProcess(user_id).get_all_engagement_dict()
-        form = EngagementForm(obj=_obj)
-        if form.validate_on_submit():
-            form.save()
+        e_form = EngagementForm(obj=_obj)
+        if e_form.validate_on_submit():
+            e_form.save()
             flash(u"修改成功", level='success')
             return redirect(url_for('dashboard.user.invitation', user_id=user_id))
         else:
-            return render_template(self.template_name, form=form, user=user)
+            return render_template(self.template_name, form=e_form, user=user)
 
 
 class UserAuthView(BaseView):
