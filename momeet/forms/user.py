@@ -168,9 +168,15 @@ class UserForm(BaseForm):
         self.init_choices()
 
     def save(self):
-        user = self._obj or User()
-        work = user.work.order_by(WorkExperience.id.desc()).first() or WorkExperience()
-        edu = user.edu.order_by(EduExperience.id.desc()).first() or EduExperience()
+        if self._obj:
+            user = self._obj or User()
+            work = user.work.order_by(WorkExperience.id.desc()).first()
+            edu = user.edu.order_by(EduExperience.id.desc()).first()
+        else:
+            user = User(user_name="User")
+            user.save()
+            work = WorkExperience(user_id=user.id)
+            edu = EduExperience(user_id=user.id)
         for k, v in self.data.items():
             if k == 'avatar':
                 if v:
