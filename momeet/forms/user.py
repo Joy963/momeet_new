@@ -11,7 +11,8 @@ from momeet.utils import safe_int
 from momeet.utils.upload import save_upload_file_to_qiniu, allowed_file
 from momeet.utils.view import (
     CustomRadioField as RadioField,
-    MultiCheckboxField
+    MultiCheckboxField,
+    CustomQuerySelectField as QuerySelectField
 )
 from momeet.utils.error import ErrorsEnum
 from .fields_name import UserFields
@@ -442,17 +443,23 @@ class UserSearchForm(BaseForm):
     text = StringField(u'用户搜索', [validators.required()])
 
 
-class UserJobLabelForm(BaseForm):
-    text = StringField(u'工作标签', [validators.required()])
-
-    def save(self):
-        job_label = get_job_label_or_create(name=self.text.data)
-        return job_label.save()
+# class UserJobLabelForm(BaseForm):
+#     text = StringField(u'工作标签', [validators.required()])
+#
+#     def save(self):
+#         job_label = get_job_label_or_create(name=self.text.data)
+#         return job_label.save()
 
 
 class UserPersonalLabelForm(BaseForm):
     text = StringField(u'个人标签', [validators.required()])
+    user = QuerySelectField(u'所属用户',
+                            query_factory=get_all_user,
+                            allow_blank=True,
+                            blank_text=u'-- 请选择 --')
 
     def save(self):
-        personal_label = get_personal_label_or_create(name=self.text.data)
+        print self.user.data
+        print type(self.user.data)
+        personal_label = get_personal_label_or_create(name=self.text.data, user_id=self.user.data.id)
         return personal_label.save()

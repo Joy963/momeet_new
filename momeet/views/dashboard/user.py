@@ -245,31 +245,26 @@ class UserAuthView(BaseView):
             return render_template(self.template_name, form=form)
 
 
-class JobLabelView(BaseView):
-    template_name = "dashboard/user/job_label.html"
+class PersonalLabelView(BaseView):
+    template_name = "dashboard/user/personal_label.html"
 
     def get(self):
         page = safe_int(request.args.get("page", 1))
-        items, count = get_job_label_list_by_page(page=page)
+        items, count = get_personal_label_list_by_page(page=page)
         pagination = Pagination(page, USER_PER_PAGE_COUNT, count)
-        job_form = UserJobLabelForm(csrf_enabled=False)
+        personal_form = UserPersonalLabelForm(csrf_enabled=False)
         data = dict(
             items=items,
             pagination=pagination,
-            job_form=job_form
+            personal_form=personal_form
         )
-        print items, pagination
         return render_template(self.template_name, **data)
 
     def post(self):
-        job_form = UserJobLabelForm(csrf_enabled=False)
+        job_form = UserPersonalLabelForm(csrf_enabled=False)
         if job_form.validate_on_submit():
             job_form.save()
-        return redirect(url_for('dashboard.user.job_label'))
-
-
-class PersonalLabelView(BaseView):
-    pass
+        return redirect(url_for('dashboard.user.personal_label'))
 
 
 bp.add_url_rule("list/", view_func=UserListView.as_view("list"))
@@ -284,5 +279,4 @@ bp.add_url_rule("<int:user_id>/description/", view_func=UserDescriptionView.as_v
 bp.add_url_rule("<int:user_id>/invitation/", view_func=UserEngagementView.as_view("invitation"))
 bp.add_url_rule("<int:user_id>/auth/", view_func=UserAuthView.as_view("auth"))
 
-bp.add_url_rule("job_label/", view_func=JobLabelView.as_view("job_label"))
-bp.add_url_rule("personal_label/<string:uid>", view_func=PersonalLabelView.as_view("personal_label"))
+bp.add_url_rule("personal_label", view_func=PersonalLabelView.as_view("personal_label"))

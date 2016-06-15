@@ -12,22 +12,24 @@ from sqlalchemy import or_
 USER_PER_PAGE_COUNT = 20
 
 
-def get_job_label_or_create(**kwargs):
-    return JobLabel.query.filter_by(**kwargs).first() or JobLabel(**kwargs)
+# def get_job_label_or_create(**kwargs):
+#     return JobLabel.query.filter_by(**kwargs).first() or JobLabel(**kwargs)
 
 
-def get_job_label_list_by_page(page=1, **kwargs):
-    labels = JobLabel.query.filter_by(**kwargs).paginate(page, USER_PER_PAGE_COUNT)
-    pagination = Pagination(page, USER_PER_PAGE_COUNT, labels.total)
-    return labels.items, pagination
+# def get_job_label_list_by_page(page=1, **kwargs):
+#     labels = JobLabel.query.filter_by(**kwargs).paginate(page, USER_PER_PAGE_COUNT)
+#     pagination = Pagination(page, USER_PER_PAGE_COUNT, labels.total)
+#     return labels.items, pagination
 
 
 def get_personal_label_or_create(**kwargs):
     return PersonalLabel.query.filter_by(**kwargs).first() or PersonalLabel(**kwargs)
 
 
-def get_personal_label_list_by_page(page=1, user_id=None):
-    pass
+def get_personal_label_list_by_page(page=1, **kwargs):
+    labels = PersonalLabel.query.filter_by(**kwargs).paginate(page, USER_PER_PAGE_COUNT)
+    pagination = Pagination(page, USER_PER_PAGE_COUNT, labels.total)
+    return labels.items, pagination
 
 
 class JobLabel(BaseModel):
@@ -190,6 +192,10 @@ def get_user(user_id):
     if str(user_id).isdigit():
         return User.query.get(user_id)
     return User.query.filter_by(social_id=user_id).first()
+
+
+def get_all_user():
+    return User.query.order_by(User.id.asc()).all()
 
 
 def get_user_by_name(user_name):
