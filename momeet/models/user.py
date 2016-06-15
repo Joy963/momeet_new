@@ -121,7 +121,7 @@ class User(BaseModel, UserMixin):
         return d
 
     def to_dict_index(self):
-        columns = ['real_name', 'gender', 'longtitude', 'laititude']
+        columns = ['id', 'real_name', 'age', 'gender', 'longtitude', 'laititude', 'location']
         d = self.to_dict(columns=columns)
         d['job_label'] = ','.join(map(lambda x: x.name, self.job_label.all()))
         d['personal_label'] = ','.join(map(lambda x: x.name, self.personal_label.all()))
@@ -225,10 +225,10 @@ def get_user_list_by_page(page=1, **kwargs):
     return users.items, users.total
 
 
-def get_user_list_limit(limit=20, **kwargs):
+def get_user_list_limit(page=1, limit=20, **kwargs):
     users = User.query.filter(or_(getattr(User, k) == v for k, v in kwargs.items())) \
         .filter_by(is_active=True)
-    return users.order_by(User.id.desc()).limit(limit=limit).all()
+    return users.order_by(User.id.desc()).offset((page-1)*20).limit(limit=limit).all()
 
 
 def get_user_info(user_id):

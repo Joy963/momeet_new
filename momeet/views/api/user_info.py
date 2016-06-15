@@ -23,6 +23,7 @@ from momeet.forms.user import (
 )
 from momeet.utils.qnutil import QiniuHelper
 from momeet.utils import safe_int, Pagination
+from momeet.models.engagement import Engagement
 
 bp = Blueprint('user_info', __name__)
 
@@ -192,7 +193,12 @@ class GetQiniuUploadToken(BaseView):
 
 class IndexUserListView(BaseView):
     def get(self):
-        users = get_user_list_limit()
+        longtitude = request.args.get('longtitude')
+        laititude = request.args.get('laititude')
+        user_id = request.args.get('user_id')
+        page = request.args.get('page', 1)
+        users = get_user_list_limit(page=page)
+
         return jsonify({"success": True, "results": map(lambda _: _.to_dict_index(), users)})
 
 
