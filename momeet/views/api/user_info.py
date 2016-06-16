@@ -206,7 +206,7 @@ class IndexUserInfoView(BaseView):
     def get(self):
         user_id = request.args.get('user_id')
         user = get_user(user_id=user_id)
-        return jsonify({"success": True, "user_info": user.to_dict_index_detail() if user else {}})
+        return jsonify({"success": True, "result": user.to_dict_index_detail() if user else {}})
 
 
 bp.add_url_rule("cover/<string:uid>", view_func=UserCoverPhotoView.as_view("cover"))
