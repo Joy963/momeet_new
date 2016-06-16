@@ -135,9 +135,10 @@ class User(BaseModel, UserMixin):
         d['job_label'] = ','.join(map(lambda x: x.name, self.job_label.all()))
         d['personal_label'] = ','.join(map(lambda x: x.name, self.personal_label.all()))
         user_info = UserInfo.query.get(self.id)
-        d['cover_photo'] = user_info.cover_photo
-        d['auth_info'] = user_info.auth_info
-        d['description'] = user_info.description
+        d['user_info'] = user_info.to_dict_detail()
+        # d['cover_photo'] = user_info.cover_photo
+        # d['auth_info'] = user_info.auth_info
+        # d['description'] = user_info.description
         engagement = self.engagement.first()
         d['engagement'] = engagement.to_dict_ext()
         return d
@@ -200,6 +201,11 @@ class UserInfo(BaseModel):
     auth_info = db.Column(db.String(3000))  # 认证
     detail = db.relationship('UserDetail', backref='user_detail', lazy='dynamic')  # 详细介绍
     cover_photo = db.Column(db.String(1000))  # 封面照片
+
+    def to_dict_detail(self):
+        d = self.to_dict()
+        d['detail'] = map(lambda _: _.to_dict_ext(), self.detail.all())
+        return d
 
     @classmethod
     def create(cls, user_id, photos=None, description='', detail=''):
