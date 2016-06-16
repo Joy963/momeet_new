@@ -123,6 +123,7 @@ class User(BaseModel, UserMixin):
     def to_dict_index(self):
         columns = ['id', 'real_name', 'age', 'gender', 'longtitude', 'laititude', 'location']
         d = self.to_dict(columns=columns)
+        d['uid'] = d['id']
         d['job_label'] = ','.join(map(lambda x: x.name, self.job_label.all()))
         d['personal_label'] = ','.join(map(lambda x: x.name, self.personal_label.all()))
         user_info = UserInfo.query.get(self.id)
@@ -132,6 +133,7 @@ class User(BaseModel, UserMixin):
     def to_dict_index_detail(self):
         columns = ['id', 'real_name', 'age', 'gender', 'longtitude', 'laititude', 'location']
         d = self.to_dict(columns=columns)
+        d['uid'] = d['id']
         d['job_label'] = ','.join(map(lambda x: x.name, self.job_label.all()))
         d['personal_label'] = ','.join(map(lambda x: x.name, self.personal_label.all()))
         user_info = UserInfo.query.get(self.id)
