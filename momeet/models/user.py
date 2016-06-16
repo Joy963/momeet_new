@@ -142,7 +142,11 @@ class User(BaseModel, UserMixin):
         # d['auth_info'] = user_info.auth_info
         # d['description'] = user_info.description
         engagement = self.engagement.first()
-        d['engagement'] = engagement.to_dict_ext() if engagement else {}
+        d['engagement'] = engagement.to_dict_ext() if engagement else {
+            'engagement_desc': u'他（她）有酒，你有故事吗？他（她）暂时还未设置邀约内容，'
+                               u'您可以通过走心的说明邀请他（她），说不定他（她）会接受约见哦！',
+            'theme': map(lambda x: dict(theme=x), range(1, 10))
+        }
         return d
 
 
