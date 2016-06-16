@@ -52,6 +52,11 @@ class Engagement(BaseModel):
         uid = get_user(uid).id
         return cls.query.filter_by(user_id=uid, is_active=True, **kwargs).order_by(cls.created.desc()).all()
 
+    def to_dict_ext(self):
+        d = self.to_dict()
+        d['theme'] = map(lambda _: _.to_dict(), self.theme.all())
+        return d
+
 
 class UserEngagementProcess(object):
     def __init__(self, user_id):
