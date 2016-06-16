@@ -142,7 +142,7 @@ class User(BaseModel, UserMixin):
         # d['auth_info'] = user_info.auth_info
         # d['description'] = user_info.description
         engagement = self.engagement.first()
-        d['engagement'] = engagement.to_dict_ext()
+        d['engagement'] = engagement.to_dict_ext() if engagement else {}
         return d
 
 
