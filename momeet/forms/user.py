@@ -381,7 +381,7 @@ class UserAuthForm(BaseForm):
         ]
         self.auth_type_list.choices = _choices
         if self._obj and self._obj.auth_info:
-            self.auth_type_list.checked_list = [int(_) for _ in self._obj.auth_info]
+            self.auth_type_list.checked_list = [int(_) for _ in self._obj.auth_info.split(',')]
 
     def save(self):
         p = UserInfoProcess(self._obj.user_id)
