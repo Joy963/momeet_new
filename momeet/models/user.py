@@ -408,5 +408,5 @@ class UserInfoProcess(object):
 
     def save_auth_info(self, auth_info):
         info = get_user_info(self.user_id)
-        info.auth_info = ''.join(auth_info)
+        info.auth_info = ','.join(auth_info)
         info.save()

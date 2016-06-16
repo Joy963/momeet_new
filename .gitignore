@@ -36,3 +36,4 @@ nosetests.xml
 
 .idea
 logs/
+.DS_Store
