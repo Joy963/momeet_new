@@ -54,6 +54,8 @@ class Engagement(BaseModel):
 
     def to_dict_ext(self):
         d = self.to_dict()
+        d['engagement_desc'] = d['description']
+        del d['description']
         d['theme'] = map(lambda _: _.to_dict(), self.theme.all())
         return d
 
