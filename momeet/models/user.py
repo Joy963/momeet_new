@@ -129,6 +129,19 @@ class User(BaseModel, UserMixin):
         d['cover_photo'] = user_info.cover_photo
         return d
 
+    def to_dict_index_detail(self):
+        columns = ['id', 'real_name', 'age', 'gender', 'longtitude', 'laititude', 'location']
+        d = self.to_dict(columns=columns)
+        d['job_label'] = ','.join(map(lambda x: x.name, self.job_label.all()))
+        d['personal_label'] = ','.join(map(lambda x: x.name, self.personal_label.all()))
+        user_info = UserInfo.query.get(self.id)
+        d['cover_photo'] = user_info.cover_photo
+        d['auth_info'] = user_info.auth_info
+        d['description'] = user_info.description
+        engagement = self.engagement.first()
+        d['engagement'] = engagement.to_dict()
+        return d
+
 
 class WorkExperience(BaseModel):
     dict_default_columns = ["id", "company_name", "profession", "created", "user_id"]

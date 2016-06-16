@@ -5,12 +5,10 @@ from uuid import uuid4
 from datetime import datetime
 from momeet.lib import BaseModel, db
 from momeet.models.user import get_user
-from momeet.constants.user import EngagementStatusEnum
 from momeet.utils import FancyDict, safe_int, Pagination
-from momeet.constants.user import EngagementStatusEnum, ENGAGEMENT_STATUS_DESC
+from momeet.constants.user import EngagementStatusEnum
 from sqlalchemy.event import listens_for
 
-from sqlalchemy.orm.interfaces import MapperExtension
 
 PER_PAGE_COUNT = 15
 
