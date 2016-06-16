@@ -206,6 +206,8 @@ class UserInfo(BaseModel):
 
     def to_dict_detail(self):
         d = self.to_dict()
+        d['highlight'] = d['description']
+        del d['description']
         d['detail'] = map(lambda _: _.to_dict_ext(), self.detail.all())
         return d
 
