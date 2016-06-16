@@ -261,11 +261,11 @@ class UserBaseInfoUpdateForm(BaseForm):
             if self.data.get(k):
                 if k == 'job_label':
                     for v in self.data.get(k).split(','):
-                        job_label = get_job_label_or_create(name=v, user_id=uid)
+                        job_label = get_job_label_or_create(name=v, user_id=user.id)
                         job_label.save()
                 elif k == 'personal_label':
                     for v in self.data.get(k).split(','):
-                        personal_label = get_personal_label_or_create(name=v, user_id=uid)
+                        personal_label = get_personal_label_or_create(name=v, user_id=user.id)
                         personal_label.save()
                 else:
                     setattr(user, k, self.data.get(k))
