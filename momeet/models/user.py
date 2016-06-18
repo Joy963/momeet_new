@@ -318,7 +318,7 @@ def get_user_info_completeness(user_id=None):
         if _ == 'user_cover_photo' and user_info_dict.cover_photo:
             complete += 1
         if _ == 'user_detail':
-            if user_info.detail.count() > 1:
+            if user_info and user_info.detail.count() > 1:
                 complete += 1
                 detail_flag = True
             else:
