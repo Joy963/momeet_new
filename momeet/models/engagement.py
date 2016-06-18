@@ -49,7 +49,8 @@ class Engagement(BaseModel):
 
     @classmethod
     def get_engagement(cls, uid, **kwargs):
-        uid = get_user(uid).id
+        user = get_user(uid)
+        uid = user.id if user else None
         return cls.query.filter_by(user_id=uid, is_active=True, **kwargs).order_by(cls.created.desc()).all()
 
     def to_dict_ext(self):
