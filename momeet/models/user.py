@@ -127,7 +127,7 @@ class User(BaseModel, UserMixin):
         d['job_label'] = ','.join(map(lambda x: x.name, self.job_label.all()))
         d['personal_label'] = ','.join(map(lambda x: x.name, self.personal_label.all()))
         user_info = UserInfo.query.get(self.id)
-        d['cover_photo'] = user_info.cover_photo
+        d['cover_photo'] = user_info.cover_photo if user_info else []
         return d
 
     def to_dict_index_detail(self):
