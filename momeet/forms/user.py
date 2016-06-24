@@ -260,12 +260,14 @@ class UserBaseInfoUpdateForm(BaseForm):
         for k in self.data.keys():
             if self.data.get(k):
                 if k == 'job_label':
+                    JobLabel.query.filter_by(user_id=user.id).delete()
                     for v in self.data.get(k).split(','):
-                        job_label = get_job_label_or_create(name=v, user_id=uid)
+                        job_label = get_job_label_or_create(name=v, user_id=user.id)
                         job_label.save()
                 elif k == 'personal_label':
+                    PersonalLabel.query.filter_by(user_id=user.id).delete()
                     for v in self.data.get(k).split(','):
-                        personal_label = get_personal_label_or_create(name=v, user_id=uid)
+                        personal_label = get_personal_label_or_create(name=v, user_id=user.id)
                         personal_label.save()
                 else:
                     setattr(user, k, self.data.get(k))
@@ -381,7 +383,7 @@ class UserAuthForm(BaseForm):
         ]
         self.auth_type_list.choices = _choices
         if self._obj and self._obj.auth_info:
-            self.auth_type_list.checked_list = [int(_) for _ in self._obj.auth_info]
+            self.auth_type_list.checked_list = [int(_) for _ in self._obj.auth_info.split(',')]
 
     def save(self):
         p = UserInfoProcess(self._obj.user_id)

@@ -123,10 +123,30 @@ class User(BaseModel, UserMixin):
     def to_dict_index(self):
         columns = ['id', 'real_name', 'age', 'gender', 'longtitude', 'laititude', 'location']
         d = self.to_dict(columns=columns)
+        d['uid'] = d['id']
         d['job_label'] = ','.join(map(lambda x: x.name, self.job_label.all()))
         d['personal_label'] = ','.join(map(lambda x: x.name, self.personal_label.all()))
         user_info = UserInfo.query.get(self.id)
-        d['cover_photo'] = user_info.cover_photo
+        d['cover_photo'] = user_info.cover_photo if user_info else []
+        return d
+
+    def to_dict_index_detail(self):
+        columns = ['id', 'real_name', 'age', 'gender', 'longtitude', 'laititude', 'location']
+        d = self.to_dict(columns=columns)
+        d['uid'] = d['id']
+        d['job_label'] = ','.join(map(lambda x: x.name, self.job_label.all()))
+        d['personal_label'] = ','.join(map(lambda x: x.name, self.personal_label.all()))
+        user_info = UserInfo.query.get(self.id)
+        d['user_info'] = user_info.to_dict_detail()
+        # d['cover_photo'] = user_info.cover_photo
+        # d['auth_info'] = user_info.auth_info
+        # d['description'] = user_info.description
+        engagement = self.engagement.first()
+        d['engagement'] = engagement.to_dict_ext() if engagement else {
+            'engagement_desc': u'他（她）有酒，你有故事吗？他（她）暂时还未设置邀约内容，'
+                               u'您可以通过走心的说明邀请他（她），说不定他（她）会接受约见哦！',
+            'theme': map(lambda x: dict(theme=str(x)), range(1, 10))
+        }
         return d
 
 
@@ -187,6 +207,13 @@ class UserInfo(BaseModel):
     auth_info = db.Column(db.String(3000))  # 认证
     detail = db.relationship('UserDetail', backref='user_detail', lazy='dynamic')  # 详细介绍
     cover_photo = db.Column(db.String(1000))  # 封面照片
+
+    def to_dict_detail(self):
+        d = self.to_dict()
+        d['highlight'] = d['description']
+        del d['description']
+        d['detail'] = map(lambda _: _.to_dict_ext(), self.detail.all())
+        return d
 
     @classmethod
     def create(cls, user_id, photos=None, description='', detail=''):
@@ -291,7 +318,7 @@ def get_user_info_completeness(user_id=None):
         if _ == 'user_cover_photo' and user_info_dict.cover_photo:
             complete += 1
         if _ == 'user_detail':
-            if user_info.detail.count() > 1:
+            if user_info and user_info.detail.count() > 1:
                 complete += 1
                 detail_flag = True
             else:
@@ -408,5 +435,5 @@ class UserInfoProcess(object):
 
     def save_auth_info(self, auth_info):
         info = get_user_info(self.user_id)
-        info.auth_info = ''.join(auth_info)
+        info.auth_info = ','.join(auth_info)
         info.save()

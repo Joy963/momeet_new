@@ -8,7 +8,7 @@ all = ['DevApiConfig', 'DevWebConfig']
 
 
 class DevMixin(object):
-    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://dev:123456@127.0.0.1:3306/momeet?charset=utf8mb4"
+    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:mysql@127.0.0.1:3306/momeet?charset=utf8mb4"
 
     # 连接池
     SQLALCHEMY_POOL_SIZE = 10

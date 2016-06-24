@@ -199,13 +199,14 @@ class IndexUserListView(BaseView):
         page = request.args.get('page', 1)
         users = get_user_list_limit(page=safe_int(page))
 
-        return jsonify({"success": True, "results": map(lambda _: _.to_dict_index(), users)})
+        return jsonify({"success": True, "data": map(lambda _: _.to_dict_index(), users)})
 
 
 class IndexUserInfoView(BaseView):
     def get(self):
         user_id = request.args.get('user_id')
-        return "GET INFO"
+        user = get_user(user_id=user_id)
+        return jsonify({"success": True, "data": user.to_dict_index_detail() if user else {}})
 
 
 bp.add_url_rule("cover/<string:uid>", view_func=UserCoverPhotoView.as_view("cover"))

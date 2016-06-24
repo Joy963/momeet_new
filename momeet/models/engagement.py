@@ -5,12 +5,10 @@ from uuid import uuid4
 from datetime import datetime
 from momeet.lib import BaseModel, db
 from momeet.models.user import get_user
-from momeet.constants.user import EngagementStatusEnum
 from momeet.utils import FancyDict, safe_int, Pagination
-from momeet.constants.user import EngagementStatusEnum, ENGAGEMENT_STATUS_DESC
+from momeet.constants.user import EngagementStatusEnum
 from sqlalchemy.event import listens_for
 
-from sqlalchemy.orm.interfaces import MapperExtension
 
 PER_PAGE_COUNT = 15
 
@@ -51,8 +49,16 @@ class Engagement(BaseModel):
 
     @classmethod
     def get_engagement(cls, uid, **kwargs):
-        uid = get_user(uid).id
+        user = get_user(uid)
+        uid = user.id if user else None
         return cls.query.filter_by(user_id=uid, is_active=True, **kwargs).order_by(cls.created.desc()).all()
+
+    def to_dict_ext(self):
+        d = self.to_dict()
+        d['engagement_desc'] = d['description']
+        del d['description']
+        d['theme'] = map(lambda _: _.to_dict(), self.theme.all())
+        return d
 
 
 class UserEngagementProcess(object):
